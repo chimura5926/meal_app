@@ -209,7 +209,7 @@ async function addAiFood() {
     }
 
     try {
-        const response = await fetch('/api/estimate', {
+        const response = await fetch('/home/yuki_/meal_app/api/estimate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, image: base64Image?.split(',')[1] })

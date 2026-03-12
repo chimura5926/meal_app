@@ -22,10 +22,15 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-        const resultText = data.candidates[0].content.parts[0].text;
+
+        console.log("Gemini raw response:", JSON.stringify(data, null, 2));
+
+        const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        console.log("Gemini text:", resultText);
 
         // ```json や ``` などの余計な装飾を削除する
         const cleanJson = resultText.replace(/```json|```/g, "").trim();
+        console.log("Clean JSON:", cleanJson);
         res.status(200).json(JSON.parse(cleanJson));
     } catch (error) {
         res.status(500).json({ error: '解析に失敗しました' });
