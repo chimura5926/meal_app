@@ -1,0 +1,242 @@
+const foods = {
+
+egg:{p:6,f:5,c:0.2,k:70},
+rice:{p:4,f:0.5,c:61,k:260},
+natto:{p:8,f:5,c:6,k:100},
+kimchi:{p:1,f:0.3,c:3,k:15},
+protein:{p:20,f:1,c:3,k:100},
+kinu_tofu:{p:7,f:4.5,c:2,k:84},
+momen_tofu:{p:10,f:6.5,c:2,k:108}
+};
+
+const target = {
+p:140,
+f:50,
+c:300,
+k:2200
+};
+
+let total = {p:0,f:0,c:0,k:0};
+
+const ctx = document.getElementById("pfcChart");
+
+// app.js の該当箇所を修正
+const chart = new Chart(ctx, {
+    type: "pie",
+    data: {
+        labels: ["Protein", "Fat", "Carb"],
+        datasets: [{
+            data: [0, 0, 0],
+            backgroundColor: ["#FF6384", "#FFCE56", "#36A2EB"] // 色を付けると見やすくなります
+        }]
+    },
+    plugins: [ChartDataLabels], // プラグインを登録
+    options: {
+        plugins: {
+            datalabels: {
+                color: '#fff', // 文字色
+                font: {
+                    weight: 'bold',
+                    size: 14
+                },
+                formatter: (value, ctx) => {
+                    let sum = 0;
+                    let dataArr = ctx.chart.data.datasets[0].data;
+                    dataArr.map(data => {
+                        sum += data;
+                    });
+                    // 合計が0の場合は表示しない、それ以外は%を計算
+                    if (sum === 0) return "";
+                    let percentage = (value * 100 / sum).toFixed(1) + "%";
+                    return percentage;
+                }
+            }
+        }
+    }
+});
+
+let history = [];
+
+function addFood(){
+
+let f = document.getElementById("food").value;
+let food = foods[f];
+
+total.p += food.p;
+total.f += food.f;
+total.c += food.c;
+total.k += food.k;
+
+history.push(f);
+
+updateDisplay();
+updateChart();
+updateHistory();
+
+}
+
+function updateDisplay(){
+
+document.getElementById("p").innerText = total.p.toFixed(1);
+document.getElementById("f").innerText = total.f.toFixed(1);
+document.getElementById("c").innerText = total.c.toFixed(1);
+document.getElementById("kcal").innerText = total.k.toFixed(0);
+
+document.getElementById("remainP").innerText = (target.p-total.p).toFixed(1);
+document.getElementById("remainF").innerText = (target.f-total.f).toFixed(1);
+document.getElementById("remainC").innerText = (target.c-total.c).toFixed(1);
+document.getElementById("remainK").innerText = (target.k-total.k).toFixed(0);
+
+}
+
+function updateChart(){
+
+chart.data.datasets[0].data=[
+total.p*4,
+total.f*9,
+total.c*4
+];
+
+chart.update();
+
+
+}
+
+// app.js の末尾などに追加
+
+function addCustomFood() {
+    // 名前とPFCを取得
+    const name = document.getElementById("customName").value;
+    const p = parseFloat(document.getElementById("customP").value) || 0;
+    const f = parseFloat(document.getElementById("customF").value) || 0;
+    const c = parseFloat(document.getElementById("customC").value) || 0;
+
+    // カロリーを自動計算 (P:4kcal, F:9kcal, C:4kcal)
+    const k = (p * 4) + (f * 9) + (c * 4);
+
+    if (!name) {
+        alert("名前を入力してください");
+        return;
+    }
+
+    // 合計に加算
+    total.p += p;
+    total.f += f;
+    total.c += c;
+    total.k += k;
+
+    // 履歴に追加
+    history.push({
+        isCustom: true,
+        name: name,
+        p: p,
+        f: f,
+        c: c,
+        k: k
+    });
+
+    // 入力欄をクリア（kの入力欄は不要になるので削除してOK）
+    document.getElementById("customName").value = "";
+    document.getElementById("customP").value = "";
+    document.getElementById("customF").value = "";
+    document.getElementById("customC").value = "";
+
+    updateDisplay();
+    updateChart();
+    updateHistory();
+}
+
+// 既存の updateHistory 関数を、カスタムデータに対応するよう書き換え
+// app.js の updateHistory 関数を以下に差し替え
+function updateHistory(){
+    let tbody = document.getElementById("history");
+    tbody.innerHTML = "";
+
+    history.forEach((item, index) => {
+        // itemが文字列（既存リスト）かオブジェクト（カスタム）かを判定
+        let food = (typeof item === 'string') ? foods[item] : item;
+        let displayName = (typeof item === 'string') ? item : item.name;
+
+        let row = document.createElement("tr");
+
+        // <td>を追加して food.k を表示するように変更
+        row.innerHTML =
+            "<td>" + displayName + "</td>" +
+            "<td>" + food.p + "</td>" +
+            "<td>" + food.f + "</td>" +
+            "<td>" + food.c + "</td>" +
+            "<td>" + food.k.toFixed(0) + "</td>" + // カロリーを表示（整数に丸める）
+            '<td><button onclick="removeFood(' + index + ')">削除</button></td>';
+
+        tbody.appendChild(row);
+    });
+}
+
+// 既存の removeFood 関数も、カスタムデータに対応するよう書き換え
+function removeFood(index){
+    let item = history[index];
+    let food = (typeof item === 'string') ? foods[item] : item;
+
+    total.p -= food.p;
+    total.f -= food.f;
+    total.c -= food.c;
+    total.k -= food.k;
+
+    history.splice(index, 1);
+
+    updateDisplay();
+    updateChart();
+    updateHistory();
+}
+
+// app.js に追加
+async function addAiFood() {
+    const text = document.getElementById("aiText").value;
+    const imageFile = document.getElementById("aiImage").files[0];
+    const status = document.getElementById("aiStatus");
+    const btn = document.getElementById("aiBtn");
+
+    if (!text && !imageFile) {
+        alert("料理名を入力するか、画像を添付してください");
+        return;
+    }
+
+    status.innerText = "解析中...";
+    btn.disabled = true;
+
+    let base64Image = null;
+    if (imageFile) {
+        base64Image = await toBase64(imageFile);
+    }
+
+    try {
+        const response = await fetch('/api/estimate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, image: base64Image?.split(',')[1] })
+        });
+
+        const food = await response.json();
+
+        // 既存のロジックに流し込む
+        updateTotal(food.p, food.f, food.c, food.k);
+        history.push({ name: "[AI] " + food.name, p: food.p, f: food.f, c: food.c, k: food.k });
+        
+        refreshAll();
+        status.innerText = "追加完了！";
+        document.getElementById("aiText").value = "";
+        document.getElementById("aiImage").value = "";
+    } catch (e) {
+        status.innerText = "エラーが発生しました";
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// 画像をBase64に変換する補助関数
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});

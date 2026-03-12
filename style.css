@@ -1,0 +1,46 @@
+body{
+font-family:sans-serif;
+text-align:center;
+margin:40px;
+}
+
+button{
+font-size:12px;
+padding:2px 6px;
+}
+
+select{
+font-size:18px;
+}
+
+#pfcChart{
+width:300px;
+height:300px;
+margin:auto;
+display:block;
+}
+
+#historyTable{
+margin:auto;
+border-collapse:collapse;
+}
+
+#historyTable th,
+#historyTable td{
+border:1px solid #ccc;
+padding:5px 20px;
+text-align:center;
+}
+
+#totalTable{
+margin:auto;
+border-collapse:collapse;
+margin-bottom:20px;
+}
+
+#totalTable th,
+#totalTable td{
+border:1px solid #ccc;
+padding:10px 20px;
+text-align:center;
+}
