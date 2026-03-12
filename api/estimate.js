@@ -92,7 +92,7 @@ P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し
         console.error(err);
 
         res.status(500).json({
-            error: "サーバーエラー",
+            error: "サーバーエラーです",
             detail: err.message
         });
 
