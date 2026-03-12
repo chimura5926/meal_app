@@ -42,7 +42,7 @@ P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し
     try {
 
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1/models/gemini-2-flash:generateContent?key=${API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
             {
                 method: "POST",
                 headers: {
