@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error("バックエンドエラー:", error);
         res.status(500).json({ 
-            error: '解析プロセス中に失敗しました', 
+            error: '解析プロセス中に失敗', 
             detail: error.message 
         });
     }
