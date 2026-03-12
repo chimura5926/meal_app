@@ -217,6 +217,8 @@ async function addAiFood() {
 
         const food = await response.json();
 
+        addAiLog(food);
+
         // 【修正ポイント】既存の変数に数値を足す
         total.p += parseFloat(food.p) || 0;
         total.f += parseFloat(food.f) || 0;
@@ -255,3 +257,36 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
 });
+
+// ====== AIログ用の関数（app.jsの末尾に追加） ======
+
+// ログを画面に追加する関数
+function addAiLog(message) {
+    const logContainer = document.getElementById("aiLogContent");
+    if (!logContainer) return;
+
+    const logItem = document.createElement("div");
+    logItem.style.borderBottom = "1px solid #ddd";
+    logItem.style.padding = "5px 0";
+    
+    // 時間を取得して見やすくする
+    const now = new Date();
+    const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+    
+    // データがJSON(オブジェクト)の場合は文字列に変換、それ以外はそのまま表示
+    const displayMsg = typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
+
+    // 時間とメッセージを設定
+    logItem.innerText = `[${timeStr}]\n${displayMsg}`;
+    
+    // prependを使うことで、新しいログが「一番上」に追加されるようにします
+    logContainer.prepend(logItem); 
+}
+
+// ログをすべて消去する関数
+function clearAiLogs() {
+    const logContainer = document.getElementById("aiLogContent");
+    if (logContainer) {
+        logContainer.innerHTML = ""; // 中身を空っぽにする
+    }
+}
