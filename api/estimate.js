@@ -23,7 +23,10 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         const resultText = data.candidates[0].content.parts[0].text;
-        res.status(200).json(JSON.parse(resultText)); // 解析したJSONをフロントに返す
+
+        // ```json や ``` などの余計な装飾を削除する
+        const cleanJson = resultText.replace(/```json|```/g, "").trim();
+        res.status(200).json(JSON.parse(cleanJson));
     } catch (error) {
         res.status(500).json({ error: '解析に失敗しました' });
     }

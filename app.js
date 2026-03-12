@@ -188,8 +188,7 @@ function removeFood(index){
     updateChart();
     updateHistory();
 }
-
-// app.js に追加
+// AI解析ボタンから呼ばれる関数
 async function addAiFood() {
     const text = document.getElementById("aiText").value;
     const imageFile = document.getElementById("aiImage").files[0];
@@ -218,15 +217,31 @@ async function addAiFood() {
 
         const food = await response.json();
 
-        // 既存のロジックに流し込む
-        updateTotal(food.p, food.f, food.c, food.k);
-        history.push({ name: "[AI] " + food.name, p: food.p, f: food.f, c: food.c, k: food.k });
+        // 【修正ポイント】既存の変数に数値を足す
+        total.p += parseFloat(food.p) || 0;
+        total.f += parseFloat(food.f) || 0;
+        total.c += parseFloat(food.c) || 0;
+        total.k += parseFloat(food.k) || 0;
+
+        // 履歴に追加
+        history.push({ 
+            name: "[AI] " + food.name, 
+            p: food.p, 
+            f: food.f, 
+            c: food.c, 
+            k: food.k 
+        });
         
-        refreshAll();
+        // 【修正ポイント】既存の更新関数を呼ぶ
+        updateDisplay();
+        updateChart();
+        updateHistory();
+
         status.innerText = "追加完了！";
         document.getElementById("aiText").value = "";
         document.getElementById("aiImage").value = "";
     } catch (e) {
+        console.error(e);
         status.innerText = "エラーが発生しました";
     } finally {
         btn.disabled = false;
