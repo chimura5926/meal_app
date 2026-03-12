@@ -34,6 +34,20 @@
         <button onclick="addFood()">追加</button>
     </div>
 
+    <div class="ai-food" style="margin-top: 20px; border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;">
+        <h3 style="color: #4CAF50; margin-top: 0;">AIで追加</h3>
+        <p style="font-size: 14px; color: #666; margin-bottom: 10px;">食べたものと量を入力するか、写真をアップロードしてください。</p>
+        
+        <input type="text" id="aiText" placeholder="例: 唐揚げ定食 ご飯少なめ" style="width: 80%; padding: 5px; margin-bottom: 10px;">
+        <br>
+        <input type="file" id="aiImage" accept="image/*" style="margin-bottom: 10px;">
+        <br>
+        <button id="aiBtn" onclick="addAiFood()" style="background-color: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+            AIで解析して追加
+        </button>
+        <p id="aiStatus" style="font-size: 14px; font-weight: bold; margin-top: 10px; min-height: 20px;"></p>
+    </div>
+
     <h2>今日の合計</h2>
     <table id="totalTable">
         <thead>
