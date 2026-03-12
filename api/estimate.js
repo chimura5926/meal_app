@@ -1,4 +1,5 @@
-// Vercel Serverless Function
+import { GoogleGenAI } from "@google/genai";
+
 export default async function handler(req, res) {
 
     if (req.method !== "POST") {
@@ -15,7 +16,11 @@ export default async function handler(req, res) {
         });
     }
 
-    const prompt = `
+    try {
+
+        const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+        const prompt = `
 提供された食事内容（テキスト：${text}、または画像）から
 P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し
 以下のJSONのみ返してください。
@@ -23,56 +28,38 @@ P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し
 {"name":"料理名","p":数値,"f":数値,"c":数値,"k":数値}
 `;
 
-    const payload = {
-        contents: [
-            {
-                parts: [
-                    { text: prompt },
-                    ...(image ? [{
-                        inline_data: {
-                            mime_type: "image/jpeg",
-                            data: image
-                        }
-                    }] : [])
-                ]
-            }
-        ]
-    };
+        const parts = [{ text: prompt }];
 
-    try {
-
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            }
-        );
-
-        const data = await response.json();
-
-        if (data.error) {
-            return res.status(500).json({
-                error: "Gemini APIエラー",
-                detail: data.error.message,
-                code: data.error.code
+        if (image) {
+            parts.push({
+                inlineData: {
+                    mimeType: "image/jpeg",
+                    data: image
+                }
             });
         }
 
-        const resultText =
-            data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: [{
+                role: "user",
+                parts: parts
+            }]
+        });
+
+        const resultText = response.text;
 
         if (!resultText) {
             return res.status(500).json({
                 error: "AI応答なし",
-                raw: data
+                raw: response
             });
         }
 
-        const clean = resultText.replace(/```json|```/g, "").trim();
+        const clean = resultText
+            .replace(/```json/g, "")
+            .replace(/```/g, "")
+            .trim();
 
         let parsed;
 
@@ -92,7 +79,7 @@ P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し
         console.error(err);
 
         res.status(500).json({
-            error: "サーバーエラーです",
+            error: "サーバーエラー",
             detail: err.message
         });
 
