@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const payload = {
         contents: [{
         parts: [
-            { text: `提供された食事内容（テキスト：${text}、または画像）から、P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し、以下のJSON形式のみで返してください。余計な説明は不要です。 {"name": "料理名", "p": 数値, "f": 数値, "c": 数値, "k": 数値}` },
+            { text: `提供された食事内容（テキスト：${text}、または画像）から、P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し、以下のJSON形式のみで返してください。余計な説明は不要です。解説や挨拶などのテキストは一切含めないでください。 {"name": "料理名", "p": 数値, "f": 数値, "c": 数値, "k": 数値}` },
             ...(image ? [{ inline_data: { mime_type: "image/jpeg", data: image } }] : [])
         ]
         }]
