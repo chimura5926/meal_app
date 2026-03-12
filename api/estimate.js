@@ -33,6 +33,11 @@ export default async function handler(req, res) {
         console.log("Clean JSON:", cleanJson);
         res.status(200).json(JSON.parse(cleanJson));
     } catch (error) {
-        res.status(500).json({ error: '解析に失敗しました' });
+        console.error("バックエンドエラー:", error);
+        // error.message を追加して、本当の理由を画面に返すようにします
+        res.status(500).json({ 
+            error: '解析に失敗しました', 
+            detail: error.message 
+        });
     }
 }
