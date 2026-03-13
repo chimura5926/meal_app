@@ -189,7 +189,7 @@ function updateHistory(){
             "<td>" + food.c + "</td>" +
             "<td>" + food.k.toFixed(0) + "</td>" +
             presetBtnHtml + // 🌟 ここで先ほど作ったボタンを入れる
-            '<td><button onclick="removeFood(' + index + ')">削除</button></td>';
+            '<td><button onclick="removeFood(' + index + ')">✓</button></td>';
 
         tbody.appendChild(row);
     });
