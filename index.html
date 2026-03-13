@@ -41,16 +41,7 @@
             </select>
             <button onclick="addFood()" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px;">追加</button>
         </div>
-
-        <div id="customArea" class="input-area" style="display: none; margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-            <h3>手動追加</h3>
-            <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
-            <input type="number" id="customP" placeholder="P" style="width: 50px;">
-            <input type="number" id="customF" placeholder="F" style="width: 50px;">
-            <input type="number" id="customC" placeholder="C" style="width: 50px;">
-            <button onclick="addCustomFood()" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 10px;">追加</button>
-        </div>
-
+        
         <div id="aiArea" class="input-area" style="display: none; margin-top: 20px; border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;">
             <h3 style="color: #4CAF50; margin-top: 0;">AIで追加</h3>
             <p style="font-size: 14px; color: #666; margin-bottom: 10px;">食事内容の入力、または写真を添付してください。</p>
@@ -64,6 +55,17 @@
             </button>
             <p id="aiStatus" style="font-size: 14px; font-weight: bold; margin-top: 10px; min-height: 20px;"></p>
         </div>
+
+        <div id="customArea" class="input-area" style="display: none; margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+            <h3>手動追加</h3>
+            <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
+            <input type="number" id="customP" placeholder="P" style="width: 50px;">
+            <input type="number" id="customF" placeholder="F" style="width: 50px;">
+            <input type="number" id="customC" placeholder="C" style="width: 50px;">
+            <button onclick="addCustomFood()" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 10px;">追加</button>
+        </div>
+
+
 
         <div id="aiLogArea" style="margin-top: 20px; text-align: left; max-width: 90%; margin: 20px auto; border: 1px dashed #999; padding: 10px; border-radius: 5px; background: #f9f9f9;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
