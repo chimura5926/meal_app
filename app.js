@@ -1,8 +1,6 @@
 import { db, auth } from "./firebase.js";
 import { doc, setDoc, getDoc, collection, query, limit, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-let currentUser = null;
-let weeklyChart;
+import { signInWithRedirect, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";let weeklyChart;
 let foods = {};
 
 function getTodayString() {
@@ -38,7 +36,7 @@ const chart = new Chart(ctx, {
                 color: '#fff', // 文字色
                 font: {
                     weight: 'bold',
-                    size: 14
+                    size: 20
                 },
                 formatter: (value, ctx) => {
                     let sum = 0;
@@ -382,7 +380,7 @@ const provider = new GoogleAuthProvider();
 
 async function login() {
     try {
-        await signInWithPopup(auth, provider);
+        await signInWithRedirect(auth, provider); 
     } catch (error) {
         console.error("ログインエラー:", error);
     }
