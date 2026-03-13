@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="stylesheet" href="style.css">
     <title>食事管理</title>
 </head>
 
 <body>
 
-    <h1>チムキムキ日記</h1>
+    <h1>FitNavi</h1>
 
     <div id="loginScreen" style="text-align: center; margin-top: 50px;">
         <p>食事の記録を保存するにはログインしてください。</p>
@@ -202,6 +203,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script type="module" src="firebase.js"></script>
     <script type="module" src="app.js"></script>
+    <script>
+      // スマホがPWA（アプリ化）に対応しているかチェックして起動する
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('Service Worker 登録成功！'))
+            .catch(err => console.error('Service Worker 登録失敗', err));
+        });
+      }
+    </script>
 
 </body>
 </html>
