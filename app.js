@@ -247,7 +247,7 @@ async function addAiFood() {
             return;
         }
 
-        addAiLog(food);
+        // addAiLog(food);
 
         // ★最重要修正ポイント：AIの回答を確実に数値(Number)に変換して変数に入れておく
         const pVal = parseFloat(food.p) || 0;
@@ -299,35 +299,35 @@ const toBase64 = file => new Promise((resolve, reject) => {
 // ====== AIログ用の関数（app.jsの末尾に追加） ======
 
 // ログを画面に追加する関数
-function addAiLog(message) {
-    const logContainer = document.getElementById("aiLogContent");
-    if (!logContainer) return;
+// function addAiLog(message) {
+//     const logContainer = document.getElementById("aiLogContent");
+//     if (!logContainer) return;
 
-    const logItem = document.createElement("div");
-    logItem.style.borderBottom = "1px solid #ddd";
-    logItem.style.padding = "5px 0";
+//     const logItem = document.createElement("div");
+//     logItem.style.borderBottom = "1px solid #ddd";
+//     logItem.style.padding = "5px 0";
     
-    // 時間を取得して見やすくする
-    const now = new Date();
-    const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+//     // 時間を取得して見やすくする
+//     const now = new Date();
+//     const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
     
-    // データがJSON(オブジェクト)の場合は文字列に変換、それ以外はそのまま表示
-    const displayMsg = typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
+//     // データがJSON(オブジェクト)の場合は文字列に変換、それ以外はそのまま表示
+//     const displayMsg = typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
 
-    // 時間とメッセージを設定
-    logItem.innerText = `[${timeStr}]\n${displayMsg}`;
+//     // 時間とメッセージを設定
+//     logItem.innerText = `[${timeStr}]\n${displayMsg}`;
     
-    // prependを使うことで、新しいログが「一番上」に追加されるようにします
-    logContainer.prepend(logItem); 
-}
+//     // prependを使うことで、新しいログが「一番上」に追加されるようにします
+//     logContainer.prepend(logItem); 
+// }
 
-// ログをすべて消去する関数
-function clearAiLogs() {
-    const logContainer = document.getElementById("aiLogContent");
-    if (logContainer) {
-        logContainer.innerHTML = ""; // 中身を空っぽにする
-    }
-}
+// // ログをすべて消去する関数
+// function clearAiLogs() {
+//     const logContainer = document.getElementById("aiLogContent");
+//     if (logContainer) {
+//         logContainer.innerHTML = ""; // 中身を空っぽにする
+//     }
+// }
 
 // ====== Firestore 保存・読み込み機能 ======
 
@@ -723,7 +723,7 @@ window.addFood = addFood;
 window.addCustomFood = addCustomFood;
 window.removeFood = removeFood;
 window.addAiFood = addAiFood;
-window.clearAiLogs = clearAiLogs;
+// window.clearAiLogs = clearAiLogs;
 window.login = login;  
 window.logout = logout;
 window.switchInputMethod = switchInputMethod;
