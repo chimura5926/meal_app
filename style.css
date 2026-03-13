@@ -77,34 +77,22 @@ canvas {
     font-weight: bold;
 }
 
-/* ===== 表のPFC色分け ===== */
+/* ===== 表のPFC色分け（背景のみ・文字は黒） ===== */
 
-/* P（タンパク質）の列：赤色（#FF6384） */
+/* P（タンパク質）の列：うすい赤の背景 */
 #totalTable th:nth-child(2), #totalTable td:nth-child(2),
 #historyTable th:nth-child(2), #historyTable td:nth-child(2) {
-    background-color: rgba(255, 99, 132, 0.15); /* うすい赤の背景 */
-}
-#totalTable th:nth-child(2), #historyTable th:nth-child(2) {
-    color: #e64066; /* 見やすさのため少し濃い赤 */
-    font-size: 1.1em;
+    background-color: rgba(255, 99, 132, 0.15); 
 }
 
-/* F（脂質）の列：黄色（#FFCE56） */
+/* F（脂質）の列：うすい黄色の背景 */
 #totalTable th:nth-child(3), #totalTable td:nth-child(3),
 #historyTable th:nth-child(3), #historyTable td:nth-child(3) {
-    background-color: rgba(255, 206, 86, 0.2); /* うすい黄色の背景 */
-}
-#totalTable th:nth-child(3), #historyTable th:nth-child(3) {
-    color: #d69e00; /* #FFCE56そのままでは白背景と同化して見えないため、少し濃いめのオレンジ寄りに調整 */
-    font-size: 1.1em;
+    background-color: rgba(255, 206, 86, 0.2); 
 }
 
-/* C（炭水化物）の列：青色（#36A2EB） */
+/* C（炭水化物）の列：うすい青の背景 */
 #totalTable th:nth-child(4), #totalTable td:nth-child(4),
 #historyTable th:nth-child(4), #historyTable td:nth-child(4) {
-    background-color: rgba(54, 162, 235, 0.15); /* うすい青の背景 */
-}
-#totalTable th:nth-child(4), #historyTable th:nth-child(4) {
-    color: #2080bf; /* 見やすさのため少し濃い青 */
-    font-size: 1.1em;
+    background-color: rgba(54, 162, 235, 0.15); 
 }
