@@ -4,6 +4,14 @@ import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from
 
 let currentUser = null;
 
+function getTodayString() {
+    const now = new Date();
+    // 日本時間でのズレを防ぐための処理
+    const tzoffset = now.getTimezoneOffset() * 60000;
+    return new Date(now - tzoffset).toISOString().split('T')[0];
+}
+let currentDate = getTodayString();
+
 const foods = {
 
 egg:{p:6,f:5,c:0.2,k:70},
@@ -306,37 +314,37 @@ function clearAiLogs() {
 
 // データベースに現在の状態を保存する関数
 async function saveData() {
-    if (!currentUser) return; // ログインしていなければ保存しない
+    if (!currentUser) return;
     try {
-        // "my_app" ではなく "users" フォルダの中の "ユーザーの専用ID" に保存する
-        await setDoc(doc(db, "users", currentUser.uid), {
+        // "records" というフォルダの中の "2026-03-13" などの日付ファイルに保存する
+        await setDoc(doc(db, "users", currentUser.uid, "records", currentDate), {
             total: total,
             history: history
         });
-        console.log("データを保存しました！");
+        console.log(`${currentDate} のデータを保存しました！`);
     } catch (e) {
         console.error("保存エラー: ", e);
     }
 }
 
-// データベースから状態を読み込む関数
 async function loadData() {
-    if (!currentUser) return; // ログインしていなければ読み込まない
+    if (!currentUser) return;
     try {
-        const docSnap = await getDoc(doc(db, "users", currentUser.uid));
+        // 現在選択されている日付（currentDate）のデータを読み込む
+        const docSnap = await getDoc(doc(db, "users", currentUser.uid, "records", currentDate));
         if (docSnap.exists()) {
             const data = docSnap.data();
             total = data.total || {p:0, f:0, c:0, k:0};
             history = data.history || [];
         } else {
-            // 初めてのユーザーの場合は0に戻す
+            // その日のデータが無ければ0にリセット
             total = {p:0, f:0, c:0, k:0};
             history = [];
         }
         updateDisplay();
         updateChart();
         updateHistory();
-        console.log("データを読み込みました！");
+        console.log(`${currentDate} のデータを読み込みました！`);
     } catch (e) {
         console.error("読み込みエラー: ", e);
     }
@@ -362,23 +370,38 @@ async function logout() {
     }
 }
 
-// ログイン状態を常に監視する（ページを開いた時や、ログイン・ログアウト時に自動で動く）
-onAuthStateChanged(auth, (user) => {
+async function changeDate() {
+    currentDate = document.getElementById("datePicker").value;
     
-    // HTMLで作った「2つの箱」を取得
+    // 一旦画面の数字をゼロにしてから、新しい日付のデータを読み込む
+    total = {p:0, f:0, c:0, k:0};
+    history = [];
+    updateDisplay();
+    updateChart();
+    updateHistory();
+    
+    await loadData();
+}
+
+// 🌟 既存の window.~ のリストに1行追加
+window.changeDate = changeDate;
+
+
+// 🌟 既存の onAuthStateChanged の中身を少しだけ修正
+onAuthStateChanged(auth, (user) => {
     const loginScreen = document.getElementById("loginScreen");
     const appScreen = document.getElementById("appScreen");
 
     if (user) {
-        // ========== ログイン状態のとき ==========
         currentUser = user;
         document.getElementById("userName").innerText = user.displayName + " さん";
-        
-        // 🌟 画面の切り替え：ログイン画面を隠して、アプリ画面を出す！
         loginScreen.style.display = "none";
         appScreen.style.display = "block";
         
-        loadData(); // ログインできたらその人のデータを読み込む
+        // （追加）ログイン時にカレンダーの初期値を今日にセットする
+        document.getElementById("datePicker").value = currentDate;
+        
+        loadData();
     } else {
         // ========== ログアウト状態のとき ==========
         currentUser = null;
