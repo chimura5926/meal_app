@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc, collection, query, limit, getDocs, orderBy } from 
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 let currentUser = null;
 let weeklyChart;
+let foods = {};
 
 function getTodayString() {
     const now = new Date();
@@ -11,17 +12,6 @@ function getTodayString() {
     return new Date(now - tzoffset).toISOString().split('T')[0];
 }
 let currentDate = getTodayString();
-
-const foods = {
-
-egg:{p:6,f:5,c:0.2,k:70},
-rice:{p:4,f:0.5,c:61,k:260},
-natto:{p:8,f:5,c:6,k:100},
-kimchi:{p:1,f:0.3,c:3,k:15},
-protein:{p:20,f:1,c:3,k:100},
-kinu_tofu:{p:7,f:4.5,c:2,k:84},
-momen_tofu:{p:10,f:6.5,c:2,k:108}
-};
 
 const target = {
 p:140,
@@ -70,22 +60,27 @@ const chart = new Chart(ctx, {
 let history = [];
 
 function addFood(){
+    let f = document.getElementById("food").value;
+    
+    // 何も選択されていない（定番が空の）場合は処理を止める
+    if (!f) {
+        alert("追加する定番メニューがありません。履歴から登録してください。");
+        return;
+    }
 
-let f = document.getElementById("food").value;
-let food = foods[f];
+    let food = foods[f];
 
-total.p += food.p;
-total.f += food.f;
-total.c += food.c;
-total.k += food.k;
+    total.p += food.p;
+    total.f += food.f;
+    total.c += food.c;
+    total.k += food.k;
 
-history.push(f);
+    history.push(f);
 
-updateDisplay();
-updateChart();
-updateHistory();
-saveData();
-
+    updateDisplay();
+    updateChart();
+    updateHistory();
+    saveData();
 }
 
 function updateDisplay(){
@@ -506,20 +501,22 @@ async function addPresetFromHistory(index) {
 async function saveToPresets(name, p, f, c, k) {
     if (!currentUser) return;
     
-    // すでに同じ名前が登録されていたらスキップ
     if (foods[name]) return; 
 
-    // メモリ上のリストに追加
     foods[name] = { p: p, f: f, c: c, k: k };
 
-    // ドロップダウン（select）に追加
     const select = document.getElementById("food");
+    
+    // 最初の「定番がありません」というダミー選択肢があれば消す
+    if (select.options.length > 0 && select.options[0].value === "") {
+        select.remove(0);
+    }
+
     const option = document.createElement("option");
     option.value = name;
     option.text = name;
     select.appendChild(option);
 
-    // Firebaseに保存
     const presetId = "custom_" + Date.now();
     try {
         await setDoc(doc(db, "users", currentUser.uid, "presets", presetId), {
@@ -541,9 +538,14 @@ async function loadPresets() {
             const data = docSnap.data();
             const name = data.name;
 
-            // まだリストになければ追加する
             if (!foods[name]) {
                 foods[name] = { p: data.p, f: data.f, c: data.c, k: data.k };
+                
+                // ダミーの選択肢があれば消す
+                if (select.options.length > 0 && select.options[0].value === "") {
+                    select.remove(0);
+                }
+
                 const option = document.createElement("option");
                 option.value = name;
                 option.text = name;
