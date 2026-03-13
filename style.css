@@ -44,3 +44,16 @@ border:1px solid #ccc;
 padding:10px 20px;
 text-align:center;
 }
+
+.chart-container {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    height: 300px; /* 高さを指定 */
+    margin: 20px auto;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}

@@ -38,7 +38,7 @@ const ctx = document.getElementById("pfcChart");
 const chart = new Chart(ctx, {
     type: "pie",
     data: {
-        labels: ["Protein", "Fat", "Carb"],
+        labels: ["タンパク質", "脂質", "炭水化物"],
         datasets: [{
             data: [0, 0, 0],
             backgroundColor: ["#FF6384", "#FFCE56", "#36A2EB"] // 色を付けると見やすくなります
@@ -46,6 +46,8 @@ const chart = new Chart(ctx, {
     },
     plugins: [ChartDataLabels], // プラグインを登録
     options: {
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             datalabels: {
                 color: '#fff', // 文字色
@@ -56,13 +58,9 @@ const chart = new Chart(ctx, {
                 formatter: (value, ctx) => {
                     let sum = 0;
                     let dataArr = ctx.chart.data.datasets[0].data;
-                    dataArr.map(data => {
-                        sum += data;
-                    });
-                    // 合計が0の場合は表示しない、それ以外は%を計算
+                    dataArr.map(data => { sum += data; });
                     if (sum === 0) return "";
-                    let percentage = (value * 100 / sum).toFixed(1) + "%";
-                    return percentage;
+                    return (value * 100 / sum).toFixed(1) + "%";
                 }
             }
         }
