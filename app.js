@@ -166,16 +166,27 @@ function updateHistory(){
         let food = (typeof item === 'string') ? foods[item] : item;
         let displayName = (typeof item === 'string') ? item : item.name;
 
+        // 🌟 追加：AIの接頭辞を外した素の名前で、すでに定番(foods)に存在するかチェック
+        let cleanName = displayName.replace(/^\[AI\]\s*/, '');
+        let isAlreadyPreset = !!foods[cleanName]; 
+
         let row = document.createElement("tr");
 
-        // 「定番へ」ボタンの列を追加
+        // 🌟 追加：登録済みならグレーのボタン、未登録なら青いボタンにする
+        let presetBtnHtml = "";
+        if (isAlreadyPreset) {
+            presetBtnHtml = '<td><button disabled style="background-color:#ccc; color:#666; border:none; border-radius:3px; cursor:not-allowed;">✓</button></td>';
+        } else {
+            presetBtnHtml = '<td><button onclick="addPresetFromHistory(' + index + ')" style="background-color:#2196F3; color:white; border:none; border-radius:3px; cursor:pointer;">✓</button></td>';
+        }
+
         row.innerHTML =
             "<td>" + displayName + "</td>" +
             "<td>" + food.p + "</td>" +
             "<td>" + food.f + "</td>" +
             "<td>" + food.c + "</td>" +
             "<td>" + food.k.toFixed(0) + "</td>" +
-            '<td><button onclick="addPresetFromHistory(' + index + ')" style="background-color:#2196F3; color:white; border:none; border-radius:3px;">追加</button></td>' +
+            presetBtnHtml + // 🌟 ここで先ほど作ったボタンを入れる
             '<td><button onclick="removeFood(' + index + ')">削除</button></td>';
 
         tbody.appendChild(row);
@@ -525,6 +536,9 @@ async function addPresetFromHistory(index) {
 
     await saveToPresets(cleanName, parseFloat(food.p)||0, parseFloat(food.f)||0, parseFloat(food.c)||0, parseFloat(food.k)||0);
     alert("「" + cleanName + "」を定番リストに追加しました！");
+    
+    // 🌟 これを追加：追加直後に履歴テーブルを描画し直して、ボタンをグレーにする
+    updateHistory(); 
 }
 
 async function saveToPresets(name, p, f, c, k) {
