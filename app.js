@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/f
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 let currentUser = null;
+let weeklyChart;
 
 function getTodayString() {
     const now = new Date();
@@ -347,6 +348,8 @@ async function loadData() {
         console.log(`${currentDate} のデータを読み込みました！`);
     } catch (e) {
         console.error("読み込みエラー: ", e);
+
+        updateWeeklyChart();
     }
 }
 
@@ -418,6 +421,58 @@ onAuthStateChanged(auth, (user) => {
         updateHistory();
     }
 });
+
+import { collection, query, limit, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+// 🌟 過去7日分のデータを取得して棒グラフを表示する関数
+async function updateWeeklyChart() {
+    if (!currentUser) return;
+
+    const labels = [];
+    const kcalData = [];
+
+    // 今日から遡って7日分のデータを準備
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        const tzoffset = d.getTimezoneOffset() * 60000;
+        const dateObj = new Date(d - tzoffset - (i * 24 * 60 * 60 * 1000));
+        const dateStr = dateObj.toISOString().split('T')[0];
+        
+        labels.push(dateStr.slice(5)); // "2026-03-13" -> "03-13" のように短くする
+
+        // Firebaseからその日のデータを取得
+        const docSnap = await getDoc(doc(db, "users", currentUser.uid, "records", dateStr));
+        if (docSnap.exists()) {
+            kcalData.push(docSnap.data().total.k);
+        } else {
+            kcalData.push(0); // データがない日は0
+        }
+    }
+
+    const ctxWeekly = document.getElementById("weeklyChart").getContext("2d");
+
+    // すでにグラフがあれば壊して作り直す（重複防止）
+    if (weeklyChart) {
+        weeklyChart.destroy();
+    }
+
+    weeklyChart = new Chart(ctxWeekly, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '摂取カロリー (kcal)',
+                data: kcalData,
+                backgroundColor: '#4CAF50'
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
 // ====== HTMLから関数を呼び出せるようにする設定 ======
 window.addFood = addFood;
 window.addCustomFood = addCustomFood;
