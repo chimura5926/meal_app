@@ -153,3 +153,17 @@ button[onclick="editProfile()"] {
     padding: 6px 12px;
     border-radius: 4px;
 }
+
+.input-area input[type="text"],
+.input-area input[type="number"],
+.input-area select {
+    font-size: 16px !important; /* 手動追加のサイズに合わせる */
+    padding: 10px !important;   /* 余白を揃えて押しやすくする */
+    box-sizing: border-box;
+}
+
+/* AI解析中のステータス文字も少し調整 */
+#aiStatus {
+    font-size: 14px;
+    margin-top: 10px;
+}
