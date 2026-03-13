@@ -615,7 +615,12 @@ async function saveProfile() {
 
     // 4. PFCバランスの計算
     // P (タンパク質): 筋肉維持のため体重1kgあたり2g (1g=4kcal)
-    const targetP = weight * 2;
+    let targetP;
+    if (goal === "maintain") {
+        targetP = weight * 0.8; // 現状維持
+    } else {
+        targetP = weight * 1.6; // 減量期・増量期
+    }
     const pKcal = targetP * 4;
 
     // F (脂質): ホルモンバランス維持のため総カロリーの25% (1g=9kcal)
