@@ -5,6 +5,19 @@ margin:20px;           /* 少し余白を減らして横幅を広く使う */
 font-size:16px;        /* 🌟全体の文字を少し大きく */
 }
 
+h1 {
+    font-size: 32px;      /* 🌟フォントを大きく（お好みに合わせて30〜36pxで調整してください） */
+    margin-top: 10px;    /* 画面上部との隙間 */
+    margin-bottom: 5px;  /* 🌟下のインストールボタンや日付との間隔をギュッと詰める */
+    color: #4CAF50;      /* アプリのテーマカラー（緑） */
+}
+
+/* ついでに日付エリア（appScreenの最初のdiv）も上部を詰めましょう */
+#appScreen > div:first-child {
+    margin-top: 0;       /* 🌟さらに隙間をなくす */
+    padding-top: 0;
+}
+
 button{
 font-size:14px;        /* 🌟少し大きく */
 padding:4px 8px;
