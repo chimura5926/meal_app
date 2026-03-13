@@ -480,4 +480,4 @@ window.removeFood = removeFood;
 window.addAiFood = addAiFood;
 window.clearAiLogs = clearAiLogs;
 window.login = login;  
-window.logout = logout
+window.logout = logout;
