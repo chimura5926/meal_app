@@ -167,3 +167,29 @@ button[onclick="editProfile()"] {
     font-size: 14px;
     margin-top: 10px;
 }
+
+h2 {
+    margin-top: 40px;    /* 上にしっかり隙間を作る */
+    margin-bottom: 20px; /* 下の表やグラフとの隙間 */
+    font-size: 1.2rem;
+    border-bottom: 1px solid #eee; /* 軽く線を引くと区切りが明確になります */
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* 各入力エリア（定番・手動・AI）の下に余白を作る */
+.input-area {
+    margin-bottom: 30px !important;
+}
+
+/* グラフコンテナの下に余白を作る */
+.chart-container, 
+#weeklyChart {
+    margin-bottom: 40px !important;
+}
+
+/* テーブルの下に余白を作る */
+#totalTable, 
+#historyTable {
+    margin-bottom: 30px !important;
+}
