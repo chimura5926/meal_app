@@ -227,24 +227,38 @@ async function addAiFood() {
 
         const food = await response.json();
 
+        // エラーが返ってきていたら処理を止めて知らせる
+        if (food.error) {
+            console.error("APIエラー:", food);
+            status.innerText = "解析に失敗しました";
+            alert("エラー: " + food.error + "\n" + (food.raw_text || ""));
+            return;
+        }
+
         addAiLog(food);
 
-        // 【修正ポイント】既存の変数に数値を足す
-        total.p += parseFloat(food.p) || 0;
-        total.f += parseFloat(food.f) || 0;
-        total.c += parseFloat(food.c) || 0;
-        total.k += parseFloat(food.k) || 0;
+        // ★最重要修正ポイント：AIの回答を確実に数値(Number)に変換して変数に入れておく
+        const pVal = parseFloat(food.p) || 0;
+        const fVal = parseFloat(food.f) || 0;
+        const cVal = parseFloat(food.c) || 0;
+        const kVal = parseFloat(food.k) || 0;
 
-        // 履歴に追加
+        // 合計に数値を足す
+        total.p += pVal;
+        total.f += fVal;
+        total.c += cVal;
+        total.k += kVal;
+
+        // 履歴に追加（ここでも先ほど作った数値の変数を入れる！）
         history.push({ 
             name: "[AI] " + food.name, 
-            p: food.p, 
-            f: food.f, 
-            c: food.c, 
-            k: food.k 
+            p: pVal, 
+            f: fVal, 
+            c: cVal, 
+            k: kVal 
         });
         
-        // 【修正ポイント】既存の更新関数を呼ぶ
+        // 既存の更新関数を呼ぶ
         updateDisplay();
         updateChart();
         updateHistory();

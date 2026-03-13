@@ -16,9 +16,9 @@ export default async function handler(req, res) {
     }
 
     const prompt = `
-提供された食事内容（テキスト：${text}、または画像）から
+あなたは栄養解析AIです。提供された食事内容（テキスト：${text}、または画像）から
 P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し
-以下のJSONのみ返してください。
+以下のJSONのみ返してください。「承知しました」「以下の通りです」などの挨拶や説明文は一切含めないでください。
 
 {"name":"料理名","p":数値,"f":数値,"c":数値,"k":数値}
 `;
@@ -72,7 +72,13 @@ P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し
             });
         }
 
-        const clean = resultText.replace(/```json|```/g, "").trim();
+        let clean = resultText.replace(/```json|```/g, "").trim();
+        
+        // ★これを追加：文章が混ざっていても { から } までを強制的に抜き出す
+        const match = clean.match(/\{[\s\S]*\}/);
+        if (match) {
+            clean = match[0];
+        }
 
         let parsed;
 
@@ -81,7 +87,8 @@ P(タンパク質), F(脂質), C(炭水化物), k(カロリー)を推定し
         } catch {
             return res.status(500).json({
                 error: "JSON解析失敗",
-                raw_text: resultText
+                raw_text: resultText,
+                extracted: clean // 切り取った結果もログに出す
             });
         }
 
