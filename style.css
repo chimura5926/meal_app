@@ -169,27 +169,35 @@ button[onclick="editProfile()"] {
 }
 
 h2 {
-    margin-top: 40px;    /* 上にしっかり隙間を作る */
-    margin-bottom: 20px; /* 下の表やグラフとの隙間 */
-    font-size: 1.2rem;
-    border-bottom: 1px solid #eee; /* 軽く線を引くと区切りが明確になります */
-    display: inline-block;
-    padding-bottom: 5px;
+    margin-top: 30px;    /* 前の要素との間隔（セクションの区切り） */
+    margin-bottom: 5px;  /* 🌟直後の表やグラフとの間隔をギュッと詰める */
+    font-size: 1.1rem;
+    border-bottom: 1px solid #eee;
+    display: block;      /* 幅いっぱいに線を引く */
+    text-align: left;    /* 左寄せにすると表との一体感が出ます */
+    padding-bottom: 3px;
 }
 
-/* 各入力エリア（定番・手動・AI）の下に余白を作る */
+/* 入力エリアの下の余白 */
 .input-area {
+    margin-bottom: 20px !important;
+}
+
+/* グラフコンテナの設定 */
+.chart-container {
+    margin-top: 0px !important;    /* タイトルに近づける */
+    margin-bottom: 20px !important;
+}
+
+/* 棒グラフの設定 */
+#weeklyChart {
+    margin-top: 10px !important;   /* タイトルに近づける */
     margin-bottom: 30px !important;
 }
 
-/* グラフコンテナの下に余白を作る */
-.chart-container, 
-#weeklyChart {
-    margin-bottom: 40px !important;
-}
-
-/* テーブルの下に余白を作る */
+/* テーブルの設定 */
 #totalTable, 
 #historyTable {
-    margin-bottom: 30px !important;
+    margin-top: 5px !important;    /* タイトルに近づける */
+    margin-bottom: 20px !important;
 }
