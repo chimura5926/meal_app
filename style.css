@@ -10,8 +10,21 @@ font-size:14px;        /* 🌟少し大きく */
 padding:4px 8px;
 }
 
-select{
-font-size:20px;        /* 🌟少し大きく */
+/* 1. 全体のselect指定を修正（または上書き） */
+select {
+    font-size: 14px;      /* 🌟フォントを小さく */
+    padding: 6px;
+    width: 60%;           /* 🌟横幅を小さく（お好みで 50%〜70% に調整） */
+    margin: 0 auto 10px;  /* 🌟真ん中に寄せる */
+    display: block;       /* 🌟中央寄せを有効にするために必要 */
+    text-align: center;   /* 🌟文字を真ん中にそろえる（ブラウザにより制限あり） */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 2. もしプルダウン内のテキストが左に寄る場合は以下も追加 */
+select option {
+    text-align: center;
 }
 
 #pfcChart{
