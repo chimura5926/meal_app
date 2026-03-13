@@ -183,15 +183,13 @@ function updateHistory(){
         }
 
         row.innerHTML =
-            "<td>" + displayName + "</td>" +
+            '<td class="food-name" title="' + displayName + '">' + displayName + "</td>" +
             "<td>" + food.p + "</td>" +
             "<td>" + food.f + "</td>" +
             "<td>" + food.c + "</td>" +
             "<td>" + food.k.toFixed(0) + "</td>" +
             presetBtnHtml + // 🌟 ここで先ほど作ったボタンを入れる
-            '<td><button onclick="removeFood(' + index + ')">✓</button></td>';
-
-        tbody.appendChild(row);
+            '<td><button onclick="removeFood(' + index + ')" style="background-color:#2196F3; color:white; border:none; border-radius:3px; cursor:pointer;">✓</button></td>';        tbody.appendChild(row);
     });
 }
 

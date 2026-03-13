@@ -83,6 +83,13 @@ canvas {
     font-weight: bold;
 }
 
+.food-name {
+    max-width: 140px;   /* 幅調整 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ===== 表のPFC色分け（背景のみ・文字は黒） ===== */
 
 /* P（タンパク質）の列：うすい赤の背景 */
