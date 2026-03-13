@@ -20,29 +20,34 @@ margin:auto;
 display:block;
 }
 
-#historyTable{
-margin:auto;
-border-collapse:collapse;
+/* ===== テーブルのスマホ最適化 ===== */
+#historyTable,
+#totalTable {
+    margin: auto;
+    border-collapse: collapse;
+    width: 100%; /* 🌟追加：入力エリアと同じ横幅いっぱいに広げる */
+    margin-bottom: 20px;
+    table-layout: fixed; /* 🌟追加：列の幅がガタガタにならないように固定する */
 }
 
 #historyTable th,
-#historyTable td{
-border:1px solid #ccc;
-padding:5px 20px;
-text-align:center;
-}
-
-#totalTable{
-margin:auto;
-border-collapse:collapse;
-margin-bottom:20px;
-}
-
+#historyTable td,
 #totalTable th,
-#totalTable td{
-border:1px solid #ccc;
-padding:10px 20px;
-text-align:center;
+#totalTable td {
+    border: 1px solid #ccc;
+    padding: 6px 2px; /* 🌟修正：左右の余白(20px)を極限まで削る */
+    text-align: center;
+    font-size: 12px; /* 🌟修正：スマホ画面に収まるように文字サイズを小さくする */
+    word-wrap: break-word; /* 長い文字は折り返してはみ出しを防ぐ */
+}
+
+/* 1列目（「目標/現在/残り」や「食事名」）の幅を少し広めに確保する */
+#historyTable th:first-child,
+#historyTable td:first-child,
+#totalTable th:first-child,
+#totalTable td:first-child {
+    width: 28%;
+    font-size: 11px; /* 長い食事名が入っても崩れないように少しだけ小さく */
 }
 
 .chart-container {
