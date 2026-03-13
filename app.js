@@ -667,6 +667,43 @@ async function saveProfile() {
     }
 }
 
+async function editProfile() {
+    if (!currentUser) return;
+
+    // 1. データベースから現在のプロフィールを取得して入力欄にセットする
+    try {
+        const profileRef = doc(db, "users", currentUser.uid, "profile", "data");
+        const profileSnap = await getDoc(profileRef);
+
+        if (profileSnap.exists()) {
+            const data = profileSnap.data();
+            
+            // 性別
+            if (data.gender) {
+                document.querySelector(`input[name="gender"][value="${data.gender}"]`).checked = true;
+            }
+            // 年齢、身長、体重
+            if (data.age) document.getElementById("profAge").value = data.age;
+            if (data.height) document.getElementById("profHeight").value = data.height;
+            if (data.weight) document.getElementById("profWeight").value = data.weight;
+            
+            // 運動量、目的
+            if (data.activity) document.getElementById("profActivity").value = data.activity;
+            if (data.goal) document.getElementById("profGoal").value = data.goal;
+        }
+    } catch (e) {
+        console.error("プロフィール読み込みエラー: ", e);
+    }
+
+    // 2. アプリ画面を隠して、プロフィール画面を表示する
+    document.getElementById("appScreen").style.display = "none";
+    document.getElementById("profileScreen").style.display = "block";
+    
+    // 3. ボタンの文字を「更新する」に変更（わかりやすさのため）
+    const submitBtn = document.querySelector("#profileScreen button");
+    if(submitBtn) submitBtn.innerText = "設定を更新する";
+}
+
 // ====== HTMLから関数を呼び出せるようにする設定 ======
 window.addFood = addFood;
 window.addCustomFood = addCustomFood;
@@ -678,3 +715,4 @@ window.logout = logout;
 window.switchInputMethod = switchInputMethod;
 window.addPresetFromHistory = addPresetFromHistory;
 window.saveProfile = saveProfile;
+window.editProfile = editProfile;
