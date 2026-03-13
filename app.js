@@ -1,7 +1,6 @@
 import { db, auth } from "./firebase.js";
 import { doc, setDoc, getDoc, collection, query, limit, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-
 let currentUser = null;
 let weeklyChart;
 
@@ -421,8 +420,6 @@ onAuthStateChanged(auth, (user) => {
         updateHistory();
     }
 });
-
-import { collection, query, limit, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // 🌟 過去7日分のデータを取得して棒グラフを表示する関数
 async function updateWeeklyChart() {
