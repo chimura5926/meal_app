@@ -1,3 +1,6 @@
+import { db } from "./firebase.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
 const foods = {
 
 egg:{p:6,f:5,c:0.2,k:70},
@@ -72,6 +75,7 @@ history.push(f);
 updateDisplay();
 updateChart();
 updateHistory();
+saveData();
 
 }
 
@@ -144,6 +148,7 @@ function addCustomFood() {
     updateDisplay();
     updateChart();
     updateHistory();
+    saveData();
 }
 
 // 既存の updateHistory 関数を、カスタムデータに対応するよう書き換え
@@ -187,6 +192,7 @@ function removeFood(index){
     updateDisplay();
     updateChart();
     updateHistory();
+    saveData();
 }
 // AI解析ボタンから呼ばれる関数
 async function addAiFood() {
@@ -238,6 +244,7 @@ async function addAiFood() {
         updateDisplay();
         updateChart();
         updateHistory();
+        saveData();
 
         status.innerText = "追加完了！";
         document.getElementById("aiText").value = "";
@@ -257,6 +264,7 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
 });
+
 
 // ====== AIログ用の関数（app.jsの末尾に追加） ======
 
@@ -290,3 +298,49 @@ function clearAiLogs() {
         logContainer.innerHTML = ""; // 中身を空っぽにする
     }
 }
+
+// ====== Firestore 保存・読み込み機能 ======
+
+// データベースに現在の状態を保存する関数
+async function saveData() {
+    try {
+        await setDoc(doc(db, "my_app", "meal_data"), {
+            total: total,
+            history: history
+        });
+        console.log("データを保存しました！");
+    } catch (e) {
+        console.error("保存エラー: ", e);
+    }
+}
+
+// データベースから状態を読み込む関数
+async function loadData() {
+    try {
+        const docSnap = await getDoc(doc(db, "my_app", "meal_data"));
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            // データがあれば上書き、なければ初期値
+            total = data.total || {p:0, f:0, c:0, k:0};
+            history = data.history || [];
+            
+            // 画面を更新して反映させる
+            updateDisplay();
+            updateChart();
+            updateHistory();
+            console.log("データを読み込みました！");
+        }
+    } catch (e) {
+        console.error("読み込みエラー: ", e);
+    }
+}
+
+// ページが開かれたときに自動でデータを読み込む
+loadData();
+
+// ====== HTMLから関数を呼び出せるようにする設定 ======
+window.addFood = addFood;
+window.addCustomFood = addCustomFood;
+window.removeFood = removeFood;
+window.addAiFood = addAiFood;
+window.clearAiLogs = clearAiLogs;
