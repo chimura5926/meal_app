@@ -1,5 +1,8 @@
 import { db } from "./firebase.js";
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+let currentUser = null;
 
 const foods = {
 
@@ -303,8 +306,10 @@ function clearAiLogs() {
 
 // データベースに現在の状態を保存する関数
 async function saveData() {
+    if (!currentUser) return; // ログインしていなければ保存しない
     try {
-        await setDoc(doc(db, "my_app", "meal_data"), {
+        // "my_app" ではなく "users" フォルダの中の "ユーザーの専用ID" に保存する
+        await setDoc(doc(db, "users", currentUser.uid), {
             total: total,
             history: history
         });
@@ -316,27 +321,72 @@ async function saveData() {
 
 // データベースから状態を読み込む関数
 async function loadData() {
+    if (!currentUser) return; // ログインしていなければ読み込まない
     try {
-        const docSnap = await getDoc(doc(db, "my_app", "meal_data"));
+        const docSnap = await getDoc(doc(db, "users", currentUser.uid));
         if (docSnap.exists()) {
             const data = docSnap.data();
-            // データがあれば上書き、なければ初期値
             total = data.total || {p:0, f:0, c:0, k:0};
             history = data.history || [];
-            
-            // 画面を更新して反映させる
-            updateDisplay();
-            updateChart();
-            updateHistory();
-            console.log("データを読み込みました！");
+        } else {
+            // 初めてのユーザーの場合は0に戻す
+            total = {p:0, f:0, c:0, k:0};
+            history = [];
         }
+        updateDisplay();
+        updateChart();
+        updateHistory();
+        console.log("データを読み込みました！");
     } catch (e) {
         console.error("読み込みエラー: ", e);
     }
 }
 
 // ページが開かれたときに自動でデータを読み込む
-loadData();
+// ====== 認証機能 ======
+const provider = new GoogleAuthProvider();
+
+async function login() {
+    try {
+        await signInWithPopup(auth, provider);
+    } catch (error) {
+        console.error("ログインエラー:", error);
+    }
+}
+
+async function logout() {
+    try {
+        await signOut(auth);
+    } catch (error) {
+        console.error("ログアウトエラー:", error);
+    }
+}
+
+// ログイン状態を常に監視する（ページを開いた時や、ログイン・ログアウト時に自動で動く）
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // ログイン状態のとき
+        currentUser = user;
+        document.getElementById("userName").innerText = user.displayName + " さん";
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "inline-block";
+        
+        loadData(); // ログインできたらその人のデータを読み込む
+    } else {
+        // ログアウト状態のとき
+        currentUser = null;
+        document.getElementById("userName").innerText = "ログインしていません";
+        document.getElementById("loginBtn").style.display = "inline-block";
+        document.getElementById("logoutBtn").style.display = "none";
+        
+        // 画面の数字をゼロにリセットする
+        total = {p:0, f:0, c:0, k:0};
+        history = [];
+        updateDisplay();
+        updateChart();
+        updateHistory();
+    }
+});
 
 // ====== HTMLから関数を呼び出せるようにする設定 ======
 window.addFood = addFood;
@@ -344,3 +394,5 @@ window.addCustomFood = addCustomFood;
 window.removeFood = removeFood;
 window.addAiFood = addAiFood;
 window.clearAiLogs = clearAiLogs;
+window.login = login;  
+window.logout = logout;  

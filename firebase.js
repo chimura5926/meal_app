@@ -1,4 +1,5 @@
 // firebase.js
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
 // ▼ データベース(Firestore)の機能をインポート ▼
@@ -21,5 +22,7 @@ const analytics = getAnalytics(app);
 
 // ▼ データベースを app.js で使えるように export する ▼
 export const db = getFirestore(app);
+
+export const auth = getAuth(app);
 
 console.log("Firebase & Firestoreが正常に初期化されました！");

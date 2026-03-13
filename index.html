@@ -12,6 +12,12 @@
 
     <h1>チムキムキ日記</h1>
 
+    <div style="text-align: right; margin-bottom: 20px;">
+        <span id="userName" style="margin-right: 10px; font-weight: bold;">ログインしていません</span>
+        <button id="loginBtn" onclick="login()">Googleでログイン</button>
+        <button id="logoutBtn" onclick="logout()" style="display: none;">ログアウト</button>
+    </div>
+
     <div class="custom-food" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
         <h3>カスタム追加</h3>
         <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
