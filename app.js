@@ -468,6 +468,27 @@ async function updateWeeklyChart() {
         }
     });
 }
+
+// ====== 入力方法切り替え機能 ======
+function switchInputMethod(areaId) {
+    // 1. 全ての入力エリアを一旦隠す
+    document.getElementById('presetArea').style.display = 'none';
+    document.getElementById('customArea').style.display = 'none';
+    document.getElementById('aiArea').style.display = 'none';
+
+    // 2. 全てのタブから 'active-tab' クラス（緑色の背景）を外す
+    document.getElementById('tab-preset').classList.remove('active-tab');
+    document.getElementById('tab-custom').classList.remove('active-tab');
+    document.getElementById('tab-ai').classList.remove('active-tab');
+
+    // 3. 選ばれたエリアだけを表示する
+    document.getElementById(areaId).style.display = 'block';
+    
+    // 4. 選ばれたタブを緑色にする
+    if (areaId === 'presetArea') document.getElementById('tab-preset').classList.add('active-tab');
+    if (areaId === 'customArea') document.getElementById('tab-custom').classList.add('active-tab');
+    if (areaId === 'aiArea') document.getElementById('tab-ai').classList.add('active-tab');
+}
 // ====== HTMLから関数を呼び出せるようにする設定 ======
 window.addFood = addFood;
 window.addCustomFood = addCustomFood;
@@ -476,3 +497,4 @@ window.addAiFood = addAiFood;
 window.clearAiLogs = clearAiLogs;
 window.login = login;  
 window.logout = logout;
+window.switchInputMethod = switchInputMethod;

@@ -8,8 +8,6 @@
     <title>食事管理</title>
 </head>
 
-
-
 <body>
 
     <h1>チムキムキ日記</h1>
@@ -29,16 +27,15 @@
         <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
             <input type="date" id="datePicker" onchange="changeDate()" style="font-size: 20px; padding: 5px 10px; border-radius: 5px; border: 1px solid #ccc;">
         </div>
-        <div class="custom-food" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-            <h3>カスタム追加</h3>
-            <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
-            <input type="number" id="customP" placeholder="P" style="width: 50px;">
-            <input type="number" id="customF" placeholder="F" style="width: 50px;">
-            <input type="number" id="customC" placeholder="C" style="width: 50px;">
-            <button onclick="addCustomFood()">追加</button>
+
+        <div class="input-tabs" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+            <button id="tab-preset" onclick="switchInputMethod('presetArea')" class="active-tab">定番から選ぶ</button>
+            <button id="tab-custom" onclick="switchInputMethod('customArea')">自分で入力</button>
+            <button id="tab-ai" onclick="switchInputMethod('aiArea')">AIにお任せ</button>
         </div>
 
-        <div class="food" style="margin-top: 20px;">
+        <div id="presetArea" class="input-area" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+            <h3>定番から選ぶ</h3>
             <select id="food">
                 <option value="egg">卵(1個)</option>
                 <option value="rice">白米(0.5合)</option>
@@ -48,10 +45,19 @@
                 <option value="kinu_tofu">絹豆腐(0.5丁)</option>
                 <option value="momen_tofu">木綿豆腐(0.5丁)</option>
             </select>
-            <button onclick="addFood()">追加</button>
+            <button onclick="addFood()" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px;">追加</button>
         </div>
 
-        <div class="ai-food" style="margin-top: 20px; border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;">
+        <div id="customArea" class="input-area" style="display: none; margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+            <h3>カスタム追加</h3>
+            <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
+            <input type="number" id="customP" placeholder="P" style="width: 50px;">
+            <input type="number" id="customF" placeholder="F" style="width: 50px;">
+            <input type="number" id="customC" placeholder="C" style="width: 50px;">
+            <button onclick="addCustomFood()" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 10px;">追加</button>
+        </div>
+
+        <div id="aiArea" class="input-area" style="display: none; margin-top: 20px; border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;">
             <h3 style="color: #4CAF50; margin-top: 0;">AIで追加</h3>
             <p style="font-size: 14px; color: #666; margin-bottom: 10px;">食べたものと量を入力するか、写真をアップロードしてください。</p>
             
@@ -124,21 +130,20 @@
             <tbody id="history"></tbody>
         </table>
 
-    <h2>PFCバランス</h2>
-    <div class="chart-container">
-        <canvas id="pfcChart" width="100" height="100"></canvas>
+        <h2>PFCバランス</h2>
+        <div class="chart-container">
+            <canvas id="pfcChart" width="100" height="100"></canvas>
+        </div>
+        
+        <h2>1週間のカロリー推移</h2>
+        <div style="width: 100%; max-width: 400px; margin: auto;">
+            <canvas id="weeklyChart"></canvas>
+        </div>
     </div>
     
-    <h2>1週間のカロリー推移</h2>
-    <div style="width: 100%; max-width: 400px; margin: auto;">
-        <canvas id="weeklyChart"></canvas>
-    </div>
-</div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    
     <script type="module" src="firebase.js"></script>
-
     <script type="module" src="app.js"></script>
 
 </body>
