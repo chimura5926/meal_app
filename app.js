@@ -76,6 +76,7 @@ function addFood(){
     updateChart();
     updateHistory();
     saveData();
+    updateWeeklyChart();
 }
 
 function updateDisplay(){
@@ -154,6 +155,7 @@ function addCustomFood() {
     updateChart();
     updateHistory();
     saveData();
+    updateWeeklyChart();
 }
 
 // 既存の updateHistory 関数を、カスタムデータに対応するよう書き換え
@@ -209,6 +211,8 @@ function removeFood(index){
     updateChart();
     updateHistory();
     saveData();
+    updateWeeklyChart();
+    
 }
 // AI解析ボタンから呼ばれる関数
 async function addAiFood() {
@@ -275,6 +279,7 @@ async function addAiFood() {
         updateChart();
         updateHistory();
         saveData();
+        updateWeeklyChart();
 
         status.innerText = "追加完了！";
         document.getElementById("aiText").value = "";
@@ -459,7 +464,9 @@ async function updateWeeklyChart() {
     if (!currentUser) return;
 
     const labels = [];
-    const kcalData = [];
+    const pData = [];
+    const fData = [];
+    const cData = [];
 
     // 今日から遡って7日分のデータを準備
     for (let i = 6; i >= 0; i--) {
@@ -468,20 +475,32 @@ async function updateWeeklyChart() {
         const dateObj = new Date(d - tzoffset - (i * 24 * 60 * 60 * 1000));
         const dateStr = dateObj.toISOString().split('T')[0];
         
-        labels.push(dateStr.slice(5)); // "2026-03-13" -> "03-13" のように短くする
+        labels.push(dateStr.slice(5)); // "2026-03-13" -> "03-13"
 
-        // Firebaseからその日のデータを取得
-        const docSnap = await getDoc(doc(db, "users", currentUser.uid, "records", dateStr));
-        if (docSnap.exists()) {
-            kcalData.push(docSnap.data().total.k);
+        // ★ 今日(表示している日付)の場合は、即座に画面の合計値を使う（ラグを無くすため）
+        if (dateStr === currentDate) {
+            pData.push(total.p * 4);
+            fData.push(total.f * 9);
+            cData.push(total.c * 4);
         } else {
-            kcalData.push(0); // データがない日は0
+            // 過去の日はFirebaseから取得
+            const docSnap = await getDoc(doc(db, "users", currentUser.uid, "records", dateStr));
+            if (docSnap.exists() && docSnap.data().total) {
+                const t = docSnap.data().total;
+                pData.push((t.p || 0) * 4);
+                fData.push((t.f || 0) * 9);
+                cData.push((t.c || 0) * 4);
+            } else {
+                pData.push(0);
+                fData.push(0);
+                cData.push(0);
+            }
         }
     }
 
     const ctxWeekly = document.getElementById("weeklyChart").getContext("2d");
 
-    // すでにグラフがあれば壊して作り直す（重複防止）
+    // すでにグラフがあれば壊して作り直す
     if (weeklyChart) {
         weeklyChart.destroy();
     }
@@ -490,15 +509,22 @@ async function updateWeeklyChart() {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: '摂取カロリー (kcal)',
-                data: kcalData,
-                backgroundColor: '#4CAF50'
-            }]
+            datasets: [
+                { label: 'タンパク質', data: pData, backgroundColor: '#FF6384' },
+                { label: '脂質', data: fData, backgroundColor: '#FFCE56' },
+                { label: '炭水化物', data: cData, backgroundColor: '#36A2EB' }
+            ]
         },
         options: {
+            responsive: true,
             scales: {
-                y: { beginAtZero: true }
+                x: { stacked: true }, // X軸を積み上げにする
+                y: { stacked: true, beginAtZero: true } // Y軸を積み上げにする
+            },
+            plugins: {
+                datalabels: {
+                    display: false // 円グラフ用のパーセント表示がこちらに混ざらないように非表示
+                }
             }
         }
     });
