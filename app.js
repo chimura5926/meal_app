@@ -1,5 +1,5 @@
 import { db, auth } from "./firebase.js";
-import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { doc, setDoc, getDoc, collection, query, limit, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 let currentUser = null;
@@ -348,9 +348,9 @@ async function loadData() {
         console.log(`${currentDate} のデータを読み込みました！`);
     } catch (e) {
         console.error("読み込みエラー: ", e);
-
-        updateWeeklyChart();
     }
+    // 🌟 catchの外側でグラフを更新する
+    updateWeeklyChart();
 }
 
 // ページが開かれたときに自動でデータを読み込む
