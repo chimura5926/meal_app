@@ -8,114 +8,122 @@
     <title>食事管理</title>
 </head>
 
+
+
 <body>
 
     <h1>チムキムキ日記</h1>
 
-    <div style="text-align: right; margin-bottom: 20px;">
-        <span id="userName" style="margin-right: 10px; font-weight: bold;">ログインしていません</span>
-        <button id="loginBtn" onclick="login()">Googleでログイン</button>
-        <button id="logoutBtn" onclick="logout()" style="display: none;">ログアウト</button>
+    <div id="loginScreen" style="text-align: center; margin-top: 50px;">
+        <p>食事の記録を保存するにはログインしてください。</p>
+        <button id="loginBtn" onclick="login()" style="font-size: 18px; padding: 10px 20px;">Googleでログイン</button>
     </div>
 
-    <div class="custom-food" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-        <h3>カスタム追加</h3>
-        <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
-        <input type="number" id="customP" placeholder="P" style="width: 50px;">
-        <input type="number" id="customF" placeholder="F" style="width: 50px;">
-        <input type="number" id="customC" placeholder="C" style="width: 50px;">
-        <button onclick="addCustomFood()">追加</button>
-    </div>
+    <div id="appScreen" style="display: none;">
 
-    <div class="food" style="margin-top: 20px;">
-        <select id="food">
-            <option value="egg">卵(1個)</option>
-            <option value="rice">白米(0.5合)</option>
-            <option value="natto">納豆(1パック)</option>
-            <option value="kimchi">キムチ(50g)</option>
-            <option value="protein">プロテイン(1杯)</option>
-            <option value="kinu_tofu">絹豆腐(0.5丁)</option>
-            <option value="momen_tofu">木綿豆腐(0.5丁)</option>
-        </select>
-        <button onclick="addFood()">追加</button>
-    </div>
-
-    <div class="ai-food" style="margin-top: 20px; border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;">
-        <h3 style="color: #4CAF50; margin-top: 0;">AIで追加</h3>
-        <p style="font-size: 14px; color: #666; margin-bottom: 10px;">食べたものと量を入力するか、写真をアップロードしてください。</p>
-        
-        <input type="text" id="aiText" placeholder="天ぷら定食" style="width: 80%; padding: 5px; margin-bottom: 10px;">
-        <br>
-        <input type="file" id="aiImage" accept="image/*" style="margin-bottom: 10px;">
-        <br>
-        <button id="aiBtn" onclick="addAiFood()" style="background-color: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-            AIで解析して追加
-        </button>
-        <p id="aiStatus" style="font-size: 14px; font-weight: bold; margin-top: 10px; min-height: 20px;"></p>
-    </div>
-
-    <div id="aiLogArea" style="margin-top: 20px; text-align: left; max-width: 90%; margin: 20px auto; border: 1px dashed #999; padding: 10px; border-radius: 5px; background: #f9f9f9;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 14px; color: #555;">💬 AIからの返答ログ</h3>
-            <button onclick="clearAiLogs()" style="background: #ff4c4c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">ログを消去</button>
+        <div style="text-align: right; margin-bottom: 20px;">
+            <span id="userName" style="margin-right: 10px; font-weight: bold;"></span>
+            <button id="logoutBtn" onclick="logout()">ログアウト</button>
         </div>
-        <div id="aiLogContent" style="max-height: 150px; overflow-y: auto; font-size: 12px; font-family: monospace; white-space: pre-wrap; word-break: break-all;">
+
+        <div class="custom-food" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+            <h3>カスタム追加</h3>
+            <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
+            <input type="number" id="customP" placeholder="P" style="width: 50px;">
+            <input type="number" id="customF" placeholder="F" style="width: 50px;">
+            <input type="number" id="customC" placeholder="C" style="width: 50px;">
+            <button onclick="addCustomFood()">追加</button>
+        </div>
+
+        <div class="food" style="margin-top: 20px;">
+            <select id="food">
+                <option value="egg">卵(1個)</option>
+                <option value="rice">白米(0.5合)</option>
+                <option value="natto">納豆(1パック)</option>
+                <option value="kimchi">キムチ(50g)</option>
+                <option value="protein">プロテイン(1杯)</option>
+                <option value="kinu_tofu">絹豆腐(0.5丁)</option>
+                <option value="momen_tofu">木綿豆腐(0.5丁)</option>
+            </select>
+            <button onclick="addFood()">追加</button>
+        </div>
+
+        <div class="ai-food" style="margin-top: 20px; border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;">
+            <h3 style="color: #4CAF50; margin-top: 0;">AIで追加</h3>
+            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">食べたものと量を入力するか、写真をアップロードしてください。</p>
+            
+            <input type="text" id="aiText" placeholder="天ぷら定食" style="width: 80%; padding: 5px; margin-bottom: 10px;">
+            <br>
+            <input type="file" id="aiImage" accept="image/*" style="margin-bottom: 10px;">
+            <br>
+            <button id="aiBtn" onclick="addAiFood()" style="background-color: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                AIで解析して追加
+            </button>
+            <p id="aiStatus" style="font-size: 14px; font-weight: bold; margin-top: 10px; min-height: 20px;"></p>
+        </div>
+
+        <div id="aiLogArea" style="margin-top: 20px; text-align: left; max-width: 90%; margin: 20px auto; border: 1px dashed #999; padding: 10px; border-radius: 5px; background: #f9f9f9;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0; font-size: 14px; color: #555;">💬 AIからの返答ログ</h3>
+                <button onclick="clearAiLogs()" style="background: #ff4c4c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">ログを消去</button>
             </div>
-    </div>
+            <div id="aiLogContent" style="max-height: 150px; overflow-y: auto; font-size: 12px; font-family: monospace; white-space: pre-wrap; word-break: break-all;">
+                </div>
+        </div>
 
-    <h2>今日の合計</h2>
-    <table id="totalTable">
-        <thead>
-            <tr>
-                <th></th>
-                <th>P</th>
-                <th>F</th>
-                <th>C</th>
-                <th>kcal</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>目標</td>
-                <td id="targetP">140</td>
-                <td id="targetF">50</td>
-                <td id="targetC">300</td>
-                <td id="targetK">2200</td>
-            </tr>
-            <tr>
-                <td>現在</td>
-                <td id="p">0</td>
-                <td id="f">0</td>
-                <td id="c">0</td>
-                <td id="kcal">0</td>
-            </tr>
-            <tr>
-                <td>残り</td>
-                <td id="remainP">140</td>
-                <td id="remainF">50</td>
-                <td id="remainC">300</td>
-                <td id="remainK">2200</td>
-            </tr>
-        </tbody>
-    </table>
+        <h2>今日の合計</h2>
+        <table id="totalTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>P</th>
+                    <th>F</th>
+                    <th>C</th>
+                    <th>kcal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>目標</td>
+                    <td id="targetP">140</td>
+                    <td id="targetF">50</td>
+                    <td id="targetC">300</td>
+                    <td id="targetK">2200</td>
+                </tr>
+                <tr>
+                    <td>現在</td>
+                    <td id="p">0</td>
+                    <td id="f">0</td>
+                    <td id="c">0</td>
+                    <td id="kcal">0</td>
+                </tr>
+                <tr>
+                    <td>残り</td>
+                    <td id="remainP">140</td>
+                    <td id="remainF">50</td>
+                    <td id="remainC">300</td>
+                    <td id="remainK">2200</td>
+                </tr>
+            </tbody>
+        </table>
 
-    <h2>食事履歴</h2>
-    <table id="historyTable">
-        <thead>
-            <tr>
-                <th>食事</th>
-                <th>P</th>
-                <th>F</th>
-                <th>C</th>
-                <th>kcal</th> <th>削除</th>
-            </tr>
-        </thead>
-        <tbody id="history"></tbody>
-    </table>
+        <h2>食事履歴</h2>
+        <table id="historyTable">
+            <thead>
+                <tr>
+                    <th>食事</th>
+                    <th>P</th>
+                    <th>F</th>
+                    <th>C</th>
+                    <th>kcal</th> <th>削除</th>
+                </tr>
+            </thead>
+            <tbody id="history"></tbody>
+        </table>
 
-<h2>PFCバランス</h2>
-    <canvas id="pfcChart" width="100" height="100"></canvas>
-
+    <h2>PFCバランス</h2>
+        <canvas id="pfcChart" width="100" height="100"></canvas>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     

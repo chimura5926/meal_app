@@ -364,20 +364,28 @@ async function logout() {
 
 // ログイン状態を常に監視する（ページを開いた時や、ログイン・ログアウト時に自動で動く）
 onAuthStateChanged(auth, (user) => {
+    
+    // HTMLで作った「2つの箱」を取得
+    const loginScreen = document.getElementById("loginScreen");
+    const appScreen = document.getElementById("appScreen");
+
     if (user) {
-        // ログイン状態のとき
+        // ========== ログイン状態のとき ==========
         currentUser = user;
         document.getElementById("userName").innerText = user.displayName + " さん";
-        document.getElementById("loginBtn").style.display = "none";
-        document.getElementById("logoutBtn").style.display = "inline-block";
+        
+        // 🌟 画面の切り替え：ログイン画面を隠して、アプリ画面を出す！
+        loginScreen.style.display = "none";
+        appScreen.style.display = "block";
         
         loadData(); // ログインできたらその人のデータを読み込む
     } else {
-        // ログアウト状態のとき
+        // ========== ログアウト状態のとき ==========
         currentUser = null;
-        document.getElementById("userName").innerText = "ログインしていません";
-        document.getElementById("loginBtn").style.display = "inline-block";
-        document.getElementById("logoutBtn").style.display = "none";
+        
+        // 🌟 画面の切り替え：アプリ画面を隠して、ログイン画面を出す！
+        appScreen.style.display = "none";
+        loginScreen.style.display = "block";
         
         // 画面の数字をゼロにリセットする
         total = {p:0, f:0, c:0, k:0};
@@ -387,7 +395,6 @@ onAuthStateChanged(auth, (user) => {
         updateHistory();
     }
 });
-
 // ====== HTMLから関数を呼び出せるようにする設定 ======
 window.addFood = addFood;
 window.addCustomFood = addCustomFood;
@@ -395,4 +402,4 @@ window.removeFood = removeFood;
 window.addAiFood = addAiFood;
 window.clearAiLogs = clearAiLogs;
 window.login = login;  
-window.logout = logout;  
+window.logout = logout
