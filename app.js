@@ -421,7 +421,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         currentUser = user;
-        document.getElementById("userName").innerText = user.displayName + " さん";
+        // document.getElementById("userName").innerText = user.displayName + " さん";
         loginScreen.style.display = "none";
         
         // 🌟 プロフィールが登録されているかチェック

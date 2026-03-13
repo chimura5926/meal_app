@@ -77,60 +77,52 @@
 
     <div id="appScreen" style="display: none;">
 
-        <div style="text-align: right; margin-bottom: 20px;">
-            <span id="userName" style="margin-right: 10px; font-weight: bold;"></span>
-            <button id="logoutBtn" onclick="logout()">ログアウト</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+            <input type="date" id="datePicker" onchange="changeDate()" style="font-size: 14px; padding: 6px; border-radius: 5px; border: 1px solid #ccc;">
+            <div style="display: flex; gap: 8px;">
+                <button onclick="editProfile()" style="background-color: #2196F3; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;">設定</button>
+                <button id="logoutBtn" onclick="logout()" style="padding: 6px 10px; cursor: pointer;">ログアウト</button>
+            </div>
         </div>
 
-        <div style="text-align: right; margin-bottom: 20px;">
-            <button onclick="editProfile()" style="background-color: #2196F3; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-                プロフィール設定
-            </button>
+        <div class="input-tabs" style="display: flex; justify-content: center; gap: 5px; margin-top: 10px; width: 100%;">
+            <button id="tab-preset" onclick="switchInputMethod('presetArea')" class="active-tab">定番から追加</button>
+            <button id="tab-custom" onclick="switchInputMethod('customArea')">手動追加</button>
+            <button id="tab-ai" onclick="switchInputMethod('aiArea')">AIで追加</button>
         </div>
 
-        <div style="text-align: right; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
-            <input type="date" id="datePicker" onchange="changeDate()" style="font-size: 15px; padding: 4px 8px; border-radius: 5px; border: 1px solid #ccc;">
-        </div>
-
-        <div class="input-tabs" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-            <button id="tab-preset" onclick="switchInputMethod('presetArea')" class="active-tab">定番から選ぶ</button>
-            <button id="tab-custom" onclick="switchInputMethod('customArea')">自分で入力</button>
-            <button id="tab-ai" onclick="switchInputMethod('aiArea')">AIにお任せ</button>
-        </div>
-
-        <div id="presetArea" class="input-area" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-            <h3>定番から選ぶ</h3>
-            <select id="food">
+        <div id="presetArea" class="input-area" style="margin-top: 15px; border: 1px solid #ccc; padding: 10px; border-radius: 8px;">
+            <h3 style="margin-top: 0; margin-bottom: 5px; font-size: 16px;">定番から追加</h3>
+            <select id="food" style="margin-bottom: 5px;">
                 <option value="" disabled selected>登録されている定番がありません</option>
             </select>
             <button onclick="addFood()" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px;">追加</button>
         </div>
         
-        <div id="aiArea" class="input-area" style="display: none; margin-top: 20px; border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;">
-            <h3 style="color: #4CAF50; margin-top: 0;">AIで追加</h3>
-            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">食事内容の入力、または写真を添付してください。</p>
+        <div id="aiArea" class="input-area" style="display: none; margin-top: 15px; border: 2px solid #4CAF50; padding: 10px 10px 5px 10px; border-radius: 8px;">
+            <h3 style="color: #4CAF50; margin-top: 0; margin-bottom: 5px; font-size: 16px;">AIで追加</h3>
+            <p style="font-size: 12px; color: #666; margin-top: 0; margin-bottom: 8px;">食事内容の入力、または写真を添付</p>
             
-            <input type="text" id="aiText" placeholder="(例) 天ぷら定食" style="width: 80%; padding: 5px; margin-bottom: 10px;">
+            <input type="text" id="aiText" placeholder="(例) 天ぷら定食" style="width: 80%; padding: 5px; margin-bottom: 5px;">
             <br>
-            <input type="file" id="aiImage" accept="image/*" style="margin-bottom: 10px;">
+            <input type="file" id="aiImage" accept="image/*" style="margin-bottom: 5px; font-size: 12px;">
             <br>
-            <button id="aiBtn" onclick="addAiFood()" style="background-color: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-                AIで解析して追加
+            <button id="aiBtn" onclick="addAiFood()" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">
+                AIで追加
             </button>
-            <p id="aiStatus" style="font-size: 14px; font-weight: bold; margin-top: 10px; min-height: 20px;"></p>
+            <p id="aiStatus" style="font-size: 12px; font-weight: bold; margin-top: 5px; margin-bottom: 0; min-height: 15px;"></p>
         </div>
 
-        <div id="customArea" class="input-area" style="display: none; margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-            <h3>手動追加</h3>
-            <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
-            <input type="number" id="customP" placeholder="P" style="width: 50px;">
-            <input type="number" id="customF" placeholder="F" style="width: 50px;">
-            <input type="number" id="customC" placeholder="C" style="width: 50px;">
+        <div id="customArea" class="input-area" style="display: none; margin-top: 15px; border: 1px solid #ccc; padding: 10px; border-radius: 8px;">
+            <h3 style="margin-top: 0; margin-bottom: 5px; font-size: 16px;">手動追加</h3>
+            <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                <input type="text" id="customName" placeholder="食材名" style="width: 80px; padding: 4px;">
+                <input type="number" id="customP" placeholder="P" style="width: 40px; padding: 4px;">
+                <input type="number" id="customF" placeholder="F" style="width: 40px; padding: 4px;">
+                <input type="number" id="customC" placeholder="C" style="width: 40px; padding: 4px;">
+            </div>
             <button onclick="addCustomFood()" style="background-color: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 10px;">追加</button>
         </div>
-
-
-
         <!-- <div id="aiLogArea" style="margin-top: 20px; text-align: left; max-width: 90%; margin: 20px auto; border: 1px dashed #999; padding: 10px; border-radius: 5px; background: #f9f9f9;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h3 style="margin: 0; font-size: 14px; color: #555;">💬 AIからの返答ログ</h3>
