@@ -13,12 +13,7 @@ function getTodayString() {
 }
 let currentDate = getTodayString();
 
-const target = {
-p:140,
-f:50,
-c:300,
-k:2200
-};
+let target = { p:0, f:0, c:0, k:0 };
 
 let total = {p:0,f:0,c:0,k:0};
 
@@ -84,17 +79,23 @@ function addFood(){
 }
 
 function updateDisplay(){
+    // 🌟追加：目標（target）の数字を画面のテーブルに反映する
+    document.getElementById("targetP").innerText = target.p.toFixed(1);
+    document.getElementById("targetF").innerText = target.f.toFixed(1);
+    document.getElementById("targetC").innerText = target.c.toFixed(1);
+    document.getElementById("targetK").innerText = target.k.toFixed(0);
 
-document.getElementById("p").innerText = total.p.toFixed(1);
-document.getElementById("f").innerText = total.f.toFixed(1);
-document.getElementById("c").innerText = total.c.toFixed(1);
-document.getElementById("kcal").innerText = total.k.toFixed(0);
+    // 現在の合計
+    document.getElementById("p").innerText = total.p.toFixed(1);
+    document.getElementById("f").innerText = total.f.toFixed(1);
+    document.getElementById("c").innerText = total.c.toFixed(1);
+    document.getElementById("kcal").innerText = total.k.toFixed(0);
 
-document.getElementById("remainP").innerText = (target.p-total.p).toFixed(1);
-document.getElementById("remainF").innerText = (target.f-total.f).toFixed(1);
-document.getElementById("remainC").innerText = (target.c-total.c).toFixed(1);
-document.getElementById("remainK").innerText = (target.k-total.k).toFixed(0);
-
+    // 残り
+    document.getElementById("remainP").innerText = (target.p-total.p).toFixed(1);
+    document.getElementById("remainF").innerText = (target.f-total.f).toFixed(1);
+    document.getElementById("remainC").innerText = (target.c-total.c).toFixed(1);
+    document.getElementById("remainK").innerText = (target.k-total.k).toFixed(0);
 }
 
 function updateChart(){
@@ -397,26 +398,40 @@ window.changeDate = changeDate;
 
 
 // 🌟 既存の onAuthStateChanged の中身を少しだけ修正
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     const loginScreen = document.getElementById("loginScreen");
+    const profileScreen = document.getElementById("profileScreen"); // 追加
     const appScreen = document.getElementById("appScreen");
 
     if (user) {
         currentUser = user;
         document.getElementById("userName").innerText = user.displayName + " さん";
         loginScreen.style.display = "none";
-        appScreen.style.display = "block";
         
-        // （追加）ログイン時にカレンダーの初期値を今日にセットする
-        document.getElementById("datePicker").value = currentDate;
-        loadPresets();
-        loadData();
+        // 🌟 プロフィールが登録されているかチェック
+        const profileRef = doc(db, "users", currentUser.uid, "profile", "data");
+        const profileSnap = await getDoc(profileRef);
+        
+        if (profileSnap.exists()) {
+            // 【登録済み】保存されている目標値をセットしてアプリ画面へ
+            target = profileSnap.data().target;
+            profileScreen.style.display = "none";
+            appScreen.style.display = "block";
+            
+            document.getElementById("datePicker").value = currentDate;
+            loadPresets();
+            loadData();
+        } else {
+            // 【未登録】プロフィール設定画面を表示
+            appScreen.style.display = "none";
+            profileScreen.style.display = "block";
+        }
+
     } else {
         // ========== ログアウト状態のとき ==========
         currentUser = null;
-        
-        // 🌟 画面の切り替え：アプリ画面を隠して、ログイン画面を出す！
         appScreen.style.display = "none";
+        profileScreen.style.display = "none"; // 追加
         loginScreen.style.display = "block";
         
         // 画面の数字をゼロにリセットする
@@ -571,6 +586,82 @@ async function loadPresets() {
     }
 }
 
+async function saveProfile() {
+    if (!currentUser) return;
+
+    // 1. 画面から入力値を取得
+    const gender = document.querySelector('input[name="gender"]:checked').value;
+    const age = parseInt(document.getElementById("profAge").value);
+    const height = parseFloat(document.getElementById("profHeight").value);
+    const weight = parseFloat(document.getElementById("profWeight").value);
+    const activity = parseFloat(document.getElementById("profActivity").value);
+    const goal = document.getElementById("profGoal").value;
+
+    // 未入力チェック
+    if (!age || !height || !weight) {
+        alert("年齢、身長、体重をすべて入力してください。");
+        return;
+    }
+
+    // 2. 基礎代謝 (BMR) の計算 (ミフリン・セントジョールの方程式)
+    let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+    bmr += (gender === "male") ? 5 : -161;
+
+    // 3. 1日の総消費カロリー (TDEE) と 目的別の調整
+    let tdee = bmr * activity;
+    let targetKcal = tdee;
+    if (goal === "lose") targetKcal -= 300; // 減量は-300kcal
+    if (goal === "gain") targetKcal += 300; // 増量は+300kcal
+
+    // 4. PFCバランスの計算
+    // P (タンパク質): 筋肉維持のため体重1kgあたり2g (1g=4kcal)
+    const targetP = weight * 2;
+    const pKcal = targetP * 4;
+
+    // F (脂質): ホルモンバランス維持のため総カロリーの25% (1g=9kcal)
+    const fKcal = targetKcal * 0.25;
+    const targetF = fKcal / 9;
+
+    // C (炭水化物): 残りのカロリーすべて (1g=4kcal)
+    const cKcal = targetKcal - pKcal - fKcal;
+    const targetC = cKcal / 4;
+
+    // アプリの変数にセット
+    target = {
+        p: targetP,
+        f: targetF,
+        c: targetC,
+        k: targetKcal
+    };
+
+    try {
+        // 5. データベース (Firestore) にプロフィールと目標を保存
+        await setDoc(doc(db, "users", currentUser.uid, "profile", "data"), {
+            gender: gender,
+            age: age,
+            height: height,
+            weight: weight,
+            activity: activity,
+            goal: goal,
+            target: target
+        });
+
+        alert("あなた専用の目標を設定しました！");
+
+        // 6. 画面を切り替えてアプリを開始
+        document.getElementById("profileScreen").style.display = "none";
+        document.getElementById("appScreen").style.display = "block";
+        
+        document.getElementById("datePicker").value = currentDate;
+        loadPresets();
+        await loadData(); // これを呼ぶことで updateDisplay() も実行される
+
+    } catch (error) {
+        console.error("プロフィールの保存エラー:", error);
+        alert("保存に失敗しました。");
+    }
+}
+
 // ====== HTMLから関数を呼び出せるようにする設定 ======
 window.addFood = addFood;
 window.addCustomFood = addCustomFood;
@@ -581,3 +672,4 @@ window.login = login;
 window.logout = logout;
 window.switchInputMethod = switchInputMethod;
 window.addPresetFromHistory = addPresetFromHistory;
+window.saveProfile = saveProfile;
