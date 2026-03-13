@@ -1,21 +1,22 @@
 body{
 font-family:sans-serif;
 text-align:center;
-margin:40px;
+margin:20px;           /* 少し余白を減らして横幅を広く使う */
+font-size:16px;        /* 🌟全体の文字を少し大きく */
 }
 
 button{
-font-size:12px;
-padding:2px 6px;
+font-size:14px;        /* 🌟少し大きく */
+padding:4px 8px;
 }
 
 select{
-font-size:18px;
+font-size:20px;        /* 🌟少し大きく */
 }
 
 #pfcChart{
-width:300px;
-height:300px;
+width:320px;           /* 🌟少し拡大 */
+height:320px;
 margin:auto;
 display:block;
 }
@@ -25,9 +26,10 @@ display:block;
 #totalTable {
     margin: auto;
     border-collapse: collapse;
-    width: 100%; /* 🌟追加：入力エリアと同じ横幅いっぱいに広げる */
+    width: 100%;
+    max-width: 600px;  /* 🌟横幅を少し広げる */
     margin-bottom: 20px;
-    table-layout: fixed; /* 🌟追加：列の幅がガタガタにならないように固定する */
+    table-layout: fixed;
 }
 
 #historyTable th,
@@ -35,26 +37,26 @@ display:block;
 #totalTable th,
 #totalTable td {
     border: 1px solid #ccc;
-    padding: 6px 2px; /* 🌟修正：左右の余白(20px)を極限まで削る */
+    padding: 8px 4px;     /* 🌟少し広げる */
     text-align: center;
-    font-size: 12px; /* 🌟修正：スマホ画面に収まるように文字サイズを小さくする */
-    word-wrap: break-word; /* 長い文字は折り返してはみ出しを防ぐ */
+    font-size: 14px;      /* 🌟文字を大きく */
+    word-wrap: break-word;
 }
 
-/* 1列目（「目標/現在/残り」や「食事名」）の幅を少し広めに確保する */
+/* 1列目 */
 #historyTable th:first-child,
 #historyTable td:first-child,
 #totalTable th:first-child,
 #totalTable td:first-child {
     width: 28%;
-    font-size: 11px; /* 長い食事名が入っても崩れないように少しだけ小さく */
+    font-size: 13px;
 }
 
 .chart-container {
     position: relative;
-    width: 90%;
-    max-width: 400px;
-    height: 300px; /* 高さを指定 */
+    width: 95%;          /* 🌟横幅拡大 */
+    max-width: 450px;
+    height: 320px;
     margin: 20px auto;
 }
 
@@ -63,19 +65,18 @@ canvas {
     height: 100% !important;
 }
 
-/* タブボタンのデザイン */
+/* タブボタン */
 .input-tabs button {
-    padding: 8px 16px;
-    font-size: 14px;
+    padding: 10px 18px;   /* 🌟押しやすく */
+    font-size: 15px;
     cursor: pointer;
     border: 1px solid #4CAF50;
     background-color: white;
     color: #4CAF50;
-    border-radius: 20px; /* 丸みを持たせる */
+    border-radius: 20px;
     transition: all 0.2s ease;
 }
 
-/* 選択されているタブのデザイン */
 .input-tabs button.active-tab {
     background-color: #4CAF50;
     color: white;
