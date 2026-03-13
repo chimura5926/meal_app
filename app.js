@@ -756,3 +756,50 @@ window.switchInputMethod = switchInputMethod;
 window.addPresetFromHistory = addPresetFromHistory;
 window.saveProfile = saveProfile;
 window.editProfile = editProfile;
+
+// 1. iPhoneかどうかを判定
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+// 2. すでにホーム画面からアプリとして起動しているかを判定
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+// もしすでにアプリとして開かれていたら、インストールボタンを隠す
+if (isStandalone) {
+    const installBtn = document.getElementById('installBtn');
+    if (installBtn) installBtn.style.display = 'none';
+}
+
+// 3. Android用のインストール確認画面を「保留」しておく変数
+let deferredPrompt;
+
+// ブラウザが「インストールできるよ」と判断した時に発動するイベント（主にAndroid）
+window.addEventListener('beforeinstallprompt', (e) => {
+    // 勝手にインストール画面が出るのを防ぐ
+    e.preventDefault();
+    // イベントを後で使えるように保存
+    deferredPrompt = e;
+});
+
+// 4. ボタンが押された時の処理
+function installApp() {
+    if (deferredPrompt) {
+        // Androidの場合：保留しておいたインストール画面を出す
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                // インストールしてくれたらボタンを隠す
+                document.getElementById('installBtn').style.display = 'none';
+            }
+            deferredPrompt = null;
+        });
+    } else if (isIOS) {
+        // iPhoneの場合：やり方をポップアップで教える
+        alert("【iPhoneでのアプリ追加方法】\n\n画面下にある「共有ボタン（四角から上向きの矢印）」をタップし、メニューから「ホーム画面に追加」を選んでください！");
+    } else {
+        // それ以外（PCの非対応ブラウザなど）
+        alert("ブラウザのメニューから「ホーム画面に追加」または「アプリをインストール」を選んでください。");
+    }
+}
+
+// HTMLのボタンからこの関数を呼べるように紐付ける
+window.installApp = installApp;
