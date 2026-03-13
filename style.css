@@ -122,3 +122,34 @@ canvas {
 #historyTable th:nth-child(4), #historyTable td:nth-child(4) {
     background-color: rgba(54, 162, 235, 0.15); 
 }
+
+#appScreen > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 🌟これでプロフィール設定などの高さが中央に揃います */
+    padding: 10px 5px;
+}
+
+/* ログアウトボタンの形を整える */
+#logoutBtn {
+    background-color: #f44336; /* わかりやすく赤系に（お好みで変えてください） */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px; /* 四角すぎず丸すぎず */
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#logoutBtn:hover {
+    background-color: #d32f2f;
+}
+
+/* プロフィール設定ボタンも共通の高さに */
+button[onclick="editProfile()"] {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
