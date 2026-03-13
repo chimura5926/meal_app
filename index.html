@@ -49,7 +49,7 @@
         </div>
 
         <div id="customArea" class="input-area" style="display: none; margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-            <h3>カスタム追加</h3>
+            <h3>手動追加</h3>
             <input type="text" id="customName" placeholder="食材名" style="width: 100px;">
             <input type="number" id="customP" placeholder="P" style="width: 50px;">
             <input type="number" id="customF" placeholder="F" style="width: 50px;">
@@ -59,7 +59,7 @@
 
         <div id="aiArea" class="input-area" style="display: none; margin-top: 20px; border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;">
             <h3 style="color: #4CAF50; margin-top: 0;">AIで追加</h3>
-            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">食べたものと量を入力するか、写真をアップロードしてください。</p>
+            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">食事内容の入力、または写真を添付してください。</p>
             
             <input type="text" id="aiText" placeholder="(例) 天ぷら定食" style="width: 80%; padding: 5px; margin-bottom: 10px;">
             <br>
@@ -124,7 +124,9 @@
                     <th>P</th>
                     <th>F</th>
                     <th>C</th>
-                    <th>kcal</th> <th>削除</th>
+                    <th>kcal</th>
+                    <th>定番</th>
+                    <th>削除</th>
                 </tr>
             </thead>
             <tbody id="history"></tbody>

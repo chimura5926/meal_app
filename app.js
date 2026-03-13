@@ -167,19 +167,19 @@ function updateHistory(){
     tbody.innerHTML = "";
 
     history.forEach((item, index) => {
-        // itemが文字列（既存リスト）かオブジェクト（カスタム）かを判定
         let food = (typeof item === 'string') ? foods[item] : item;
         let displayName = (typeof item === 'string') ? item : item.name;
 
         let row = document.createElement("tr");
 
-        // <td>を追加して food.k を表示するように変更
+        // 「定番へ」ボタンの列を追加
         row.innerHTML =
             "<td>" + displayName + "</td>" +
             "<td>" + food.p + "</td>" +
             "<td>" + food.f + "</td>" +
             "<td>" + food.c + "</td>" +
-            "<td>" + food.k.toFixed(0) + "</td>" + // カロリーを表示（整数に丸める）
+            "<td>" + food.k.toFixed(0) + "</td>" +
+            '<td><button onclick="addPresetFromHistory(' + index + ')" style="background-color:#2196F3; color:white; border:none; border-radius:3px;">追加</button></td>' +
             '<td><button onclick="removeFood(' + index + ')">削除</button></td>';
 
         tbody.appendChild(row);
@@ -400,7 +400,7 @@ onAuthStateChanged(auth, (user) => {
         
         // （追加）ログイン時にカレンダーの初期値を今日にセットする
         document.getElementById("datePicker").value = currentDate;
-        
+        loadPresets();
         loadData();
     } else {
         // ========== ログアウト状態のとき ==========
@@ -489,6 +489,72 @@ function switchInputMethod(areaId) {
     if (areaId === 'customArea') document.getElementById('tab-custom').classList.add('active-tab');
     if (areaId === 'aiArea') document.getElementById('tab-ai').classList.add('active-tab');
 }
+
+// 履歴から定番に追加する関数
+async function addPresetFromHistory(index) {
+    let item = history[index];
+    let food = (typeof item === 'string') ? foods[item] : item;
+    let displayName = (typeof item === 'string') ? item : item.name;
+
+    // AI追加時に付く「[AI] 」の文字を取り除く
+    let cleanName = displayName.replace(/^\[AI\]\s*/, '');
+
+    await saveToPresets(cleanName, parseFloat(food.p)||0, parseFloat(food.f)||0, parseFloat(food.c)||0, parseFloat(food.k)||0);
+    alert("「" + cleanName + "」を定番リストに追加しました！");
+}
+
+async function saveToPresets(name, p, f, c, k) {
+    if (!currentUser) return;
+    
+    // すでに同じ名前が登録されていたらスキップ
+    if (foods[name]) return; 
+
+    // メモリ上のリストに追加
+    foods[name] = { p: p, f: f, c: c, k: k };
+
+    // ドロップダウン（select）に追加
+    const select = document.getElementById("food");
+    const option = document.createElement("option");
+    option.value = name;
+    option.text = name;
+    select.appendChild(option);
+
+    // Firebaseに保存
+    const presetId = "custom_" + Date.now();
+    try {
+        await setDoc(doc(db, "users", currentUser.uid, "presets", presetId), {
+            name: name, p: p, f: f, c: c, k: k
+        });
+    } catch (e) {
+        console.error("定番保存エラー: ", e);
+    }
+}
+
+async function loadPresets() {
+    if (!currentUser) return;
+    try {
+        const q = query(collection(db, "users", currentUser.uid, "presets"));
+        const querySnapshot = await getDocs(q);
+        const select = document.getElementById("food");
+
+        querySnapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            const name = data.name;
+
+            // まだリストになければ追加する
+            if (!foods[name]) {
+                foods[name] = { p: data.p, f: data.f, c: data.c, k: data.k };
+                const option = document.createElement("option");
+                option.value = name;
+                option.text = name;
+                select.appendChild(option);
+            }
+        });
+    } catch (e) {
+        console.error("定番読み込みエラー: ", e);
+    }
+}
+
 // ====== HTMLから関数を呼び出せるようにする設定 ======
 window.addFood = addFood;
 window.addCustomFood = addCustomFood;
@@ -498,3 +564,4 @@ window.clearAiLogs = clearAiLogs;
 window.login = login;  
 window.logout = logout;
 window.switchInputMethod = switchInputMethod;
+window.addPresetFromHistory = addPresetFromHistory;
