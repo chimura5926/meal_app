@@ -823,18 +823,27 @@ loadDinnerMenuDB();
 
 // 3. コサイン類似度を計算する関数
 function calculateCosineSimilarity(remain, menu) {
-    // 内積 (A・B)
-    const dotProduct = (remain.p * menu.p) + (remain.f * menu.f) + (remain.c * menu.c);
-    
-    // ベクトルの大きさ (|A| と |B|)
-    const magRemain = Math.sqrt((remain.p ** 2) + (remain.f ** 2) + (remain.c ** 2));
-    const magMenu = Math.sqrt((menu.p ** 2) + (menu.f ** 2) + (menu.c ** 2));
-    
-    // ゼロ除算を防ぐ（残りが0の時は類似度0とする）
-    if (magRemain === 0 || magMenu === 0) return 0;
-    
-    // コサイン類似度 (1に近いほど比率が似ている)
-    return dotProduct / (magRemain * magMenu);
+    // 全体のグラム数を計算
+    const remainTotal = remain.p + remain.f + remain.c;
+    const menuTotal = menu.p + menu.f + menu.c;
+
+    // 残りが0の場合はエラーを防ぐために0を返す
+    if (remainTotal === 0 || menuTotal === 0) return 0;
+
+    // それぞれが全体に占める割合（0.0 〜 1.0）を出す
+    const rP = remain.p / remainTotal;
+    const rF = remain.f / remainTotal;
+    const rC = remain.c / remainTotal;
+
+    const mP = menu.p / menuTotal;
+    const mF = menu.f / menuTotal;
+    const mC = menu.c / menuTotal;
+
+    // 割合のズレの絶対値をすべて足す
+    const diff = Math.abs(rP - mP) + Math.abs(rF - mF) + Math.abs(rC - mC);
+
+    // 1.0（100%）から、ズレの半分を引く（全く同じ比率なら1.0になる）
+    return Math.max(0, 1 - (diff / 2));
 }
 
 // 4. 残りPFCからトップ3を計算して返す関数
@@ -911,9 +920,9 @@ function renderSuggestions() {
         const matchPercent = Math.round(menu.similarity * 100);
 
         card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h4 style="margin: 0; font-size: 15px;"><span style="color:#ff9800;">${index + 1}位</span> ${menu.name}</h4>
-                <span style="font-size: 11px; font-weight: bold; color: #4CAF50; background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">一致度: ${matchPercent}%</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <h4 style="margin: 0; font-size: 15px; padding-right: 8px;"><span style="color:#ff9800;">${index + 1}位</span> ${menu.name}</h4>
+                <span style="font-size: 11px; font-weight: bold; color: #4CAF50; background: #e8f5e9; padding: 2px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">一致度: ${matchPercent}%</span>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; background: white; padding: 6px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 8px;">
@@ -936,7 +945,7 @@ function renderSuggestions() {
             </div>
 
             <button onclick="addSuggestedDinner('${menu.name}', ${menu.p}, ${menu.f}, ${menu.c}, ${menu.k})" style="width: 100%; padding: 8px; background-color: #ff9800; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                ＋ このメニューを追加
+                食事履歴に追加
             </button>
         `;
         
@@ -969,9 +978,8 @@ function addSuggestedDinner(name, p, f, c, k) {
     saveData();
     updateWeeklyChart();
 
-    // 4. ドロワーを閉じて、追加完了を知らせる
+    // 4. ドロワーを閉じる（※アラートは削除してスムーズにしました！）
     toggleDinnerDrawer();
-    alert(`「${name}」を食事履歴に追加しました！`);
 }
 
 // HTMLからこの関数を呼べるようにする
