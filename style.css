@@ -214,3 +214,73 @@ h2 {
     margin-top: 5px !important;    /* タイトルに近づける */
     margin-bottom: 20px !important;
 }
+
+/* ====== 晩御飯提案ドロワー（タブ）のスタイル ====== */
+#dinnerDrawer {
+    position: fixed;
+    top: 15%;            /* 上から少し下げた位置 */
+    left: 0;
+    width: 280px;        /* 引き出しの横幅 */
+    height: auto;
+    max-height: 70vh;    /* 画面の70%の高さまで */
+    background-color: white;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    border-radius: 0 12px 12px 0;
+    transition: transform 0.3s ease-in-out; /* スルッと動くアニメーション */
+    z-index: 1000;       /* どの要素よりも一番手前に表示 */
+    display: flex;
+}
+
+/* 閉じている時は左に隠す（マイナス方向にずらす） */
+.drawer-closed {
+    transform: translateX(-280px);
+}
+
+/* 開いている時は定位置に戻す */
+.drawer-open {
+    transform: translateX(0);
+}
+
+/* はみ出しているタブのボタン */
+#drawerTab {
+    position: absolute;
+    right: -40px;        /* ドロワーの外側に飛び出させる */
+    top: 20px;
+    width: 40px;
+    background-color: #ff9800; /* オレンジ色で目立たせる */
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 15px 5px;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    text-align: center;
+    line-height: 1.4;
+}
+
+#drawerContent {
+    width: 100%;
+    padding: 15px;
+    overflow-y: auto;    /* メニューがはみ出たらスクロール */
+}
+
+/* 提案されるメニューカードのデザイン */
+.suggest-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background-color: #fafafa;
+    text-align: left;
+}
+.suggest-card h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 16px;
+}
+.suggest-card p {
+    margin: 0 0 4px 0;
+    font-size: 13px;
+    color: #555;
+}

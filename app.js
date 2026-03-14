@@ -870,3 +870,55 @@ function suggestDinner() {
 
 // テスト用にグローバルから呼べるようにしておく
 window.suggestDinner = suggestDinner;
+
+// ====== ドロワーの開閉と提案メニューの表示 ======
+
+function toggleDinnerDrawer() {
+    const drawer = document.getElementById("dinnerDrawer");
+    
+    // クラスを付け替えてスライドさせる
+    if (drawer.classList.contains("drawer-closed")) {
+        // 開くときの処理
+        drawer.classList.remove("drawer-closed");
+        drawer.classList.add("drawer-open");
+        
+        // 開いた瞬間に、最新の残りPFCで提案を計算して画面に描画する
+        renderSuggestions();
+    } else {
+        // 閉じるときの処理
+        drawer.classList.remove("drawer-open");
+        drawer.classList.add("drawer-closed");
+    }
+}
+
+function renderSuggestions() {
+    const top3 = suggestDinner(); // 先ほど作った計算関数を呼ぶ
+    const listDiv = document.getElementById("suggestList");
+    
+    listDiv.innerHTML = ""; // 以前の表示を一旦リセット
+    
+    if (top3.length === 0) {
+        listDiv.innerHTML = "<p>データがありません。</p>";
+        return;
+    }
+
+    // 取得した3つのメニューをカード形式でHTMLに挿入していく
+    top3.forEach((menu, index) => {
+        const card = document.createElement("div");
+        card.className = "suggest-card";
+        
+        // 類似度(1に近いほどマッチ)をパーセンテージ風に変換しておく（おまけ）
+        const matchPercent = Math.round(menu.similarity * 100);
+
+        card.innerHTML = `
+            <h4><span style="color:#ff9800;">${index + 1}位</span> ${menu.name}</h4>
+            <p><strong>P:</strong> ${menu.p}g / <strong>F:</strong> ${menu.f}g / <strong>C:</strong> ${menu.c}g</p>
+            <p><strong>カロリー:</strong> ${menu.k} kcal</p>
+            <p style="font-size: 11px; color: #999; margin-top: 5px;">PFCバランス一致度: ${matchPercent}%</p>
+        `;
+        
+        listDiv.appendChild(card);
+    });
+}
+
+window.toggleDinnerDrawer = toggleDinnerDrawer;

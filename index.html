@@ -11,6 +11,7 @@
 
 <body>
 
+
     <h1>FitNavi</h1>
     <div style="text-align: center; margin-bottom: 5px;">
         <button id="installBtn" onclick="installApp()" style="background-color: #ff9800; color: white; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -76,7 +77,24 @@
     </div>
 
     <div id="appScreen" style="display: none;">
-
+        
+        <div id="dinnerDrawer" class="drawer-closed">
+            <div id="drawerTab" onclick="toggleDinnerDrawer()">
+                🍽️ 提案
+            </div>
+            
+            <div id="drawerContent">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                    <h3 style="margin: 0; font-size: 18px; color: #4CAF50;">AI晩御飯提案</h3>
+                    <button onclick="toggleDinnerDrawer()" style="background:none; border:none; font-size:20px; cursor:pointer; color: #999;">✖</button>
+                </div>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">残りPFCバランスに一番近いメニュー（トップ3）</p>
+                
+                <div id="suggestList">
+                    <p style="text-align: center; color: #999;">計算中...</p>
+                </div>
+            </div>
+        </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
             <input type="date" id="datePicker" onchange="changeDate()" style="font-size: 16px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; width: 60%;">
             
