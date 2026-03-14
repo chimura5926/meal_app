@@ -244,14 +244,14 @@ h2 {
 /* はみ出しているタブのボタン */
 #drawerTab {
     position: absolute;
-    right: -40px;        /* ドロワーの外側に飛び出させる */
+    right: -75px;        /* 🌟 外に飛び出す幅を広げる (-40px から -75px に変更) */
     top: 20px;
-    width: 40px;
-    background-color: #ff9800; /* オレンジ色で目立たせる */
+    width: 75px;         /* 🌟 タブの横幅自体を広げる (40px から 75px に変更) */
+    background-color: #ff9800;
     color: white;
     font-weight: bold;
     font-size: 14px;
-    padding: 15px 5px;
+    padding: 12px 0;     /* 🌟 バランスよく見えるように少し調整 */
     border-radius: 0 10px 10px 0;
     cursor: pointer;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
