@@ -801,3 +801,72 @@ function installApp() {
 
 // HTMLのボタンからこの関数を呼べるように紐付ける
 window.installApp = installApp;
+
+// ====== 晩御飯提案機能（コサイン類似度） ======
+
+// 1. JSONデータを読み込んで保存しておく変数
+let dinnerMenuDB = [];
+
+// 2. JSONファイルを読み込む関数
+async function loadDinnerMenuDB() {
+    try {
+        const response = await fetch('dinnerMenuDB.json');
+        dinnerMenuDB = await response.json();
+        console.log("晩御飯DBを読み込みました！", dinnerMenuDB.length, "件");
+    } catch (e) {
+        console.error("晩御飯DBの読み込みエラー:", e);
+    }
+}
+
+// アプリ起動時に読み込むように実行
+loadDinnerMenuDB();
+
+// 3. コサイン類似度を計算する関数
+function calculateCosineSimilarity(remain, menu) {
+    // 内積 (A・B)
+    const dotProduct = (remain.p * menu.p) + (remain.f * menu.f) + (remain.c * menu.c);
+    
+    // ベクトルの大きさ (|A| と |B|)
+    const magRemain = Math.sqrt((remain.p ** 2) + (remain.f ** 2) + (remain.c ** 2));
+    const magMenu = Math.sqrt((menu.p ** 2) + (menu.f ** 2) + (menu.c ** 2));
+    
+    // ゼロ除算を防ぐ（残りが0の時は類似度0とする）
+    if (magRemain === 0 || magMenu === 0) return 0;
+    
+    // コサイン類似度 (1に近いほど比率が似ている)
+    return dotProduct / (magRemain * magMenu);
+}
+
+// 4. 残りPFCからトップ3を計算して返す関数
+function suggestDinner() {
+    // 今の「残りPFC」を計算（マイナスの場合は0にしておく）
+    const remainP = Math.max(0, target.p - total.p);
+    const remainF = Math.max(0, target.f - total.f);
+    const remainC = Math.max(0, target.c - total.c);
+    
+    const remainVector = { p: remainP, f: remainF, c: remainC };
+
+    // 全メニューに対してコサイン類似度を計算
+    const scoredMenus = dinnerMenuDB.map(menu => {
+        const similarity = calculateCosineSimilarity(remainVector, menu);
+        return {
+            ...menu,
+            similarity: similarity
+        };
+    });
+
+    // 類似度が高い順（1に近い順）に並び替え
+    scoredMenus.sort((a, b) => b.similarity - a.similarity);
+
+    // 上位3つを取得
+    const top3 = scoredMenus.slice(0, 3);
+    
+    // 開発者ツール（コンソール）で結果を確認するため出力
+    console.log("【今の残りPFC】", remainVector);
+    console.log("【提案トップ3】", top3);
+    
+    return top3;
+}
+
+// テスト用にグローバルから呼べるようにしておく
+window.suggestDinner = suggestDinner;
