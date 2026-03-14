@@ -100,16 +100,14 @@ function updateDisplay(){
 }
 
 function updateChart(){
+    // 🌟修正：マイナスや僅かな誤差を弾いて、確実にグラフに綺麗な数値を渡す
+    chart.data.datasets[0].data = [
+        Math.max(0, total.p * 4),
+        Math.max(0, total.f * 9),
+        Math.max(0, total.c * 4)
+    ];
 
-chart.data.datasets[0].data=[
-total.p*4,
-total.f*9,
-total.c*4
-];
-
-chart.update();
-
-
+    chart.update();
 }
 
 // app.js の末尾などに追加
@@ -205,12 +203,22 @@ function removeFood(index){
 
     history.splice(index, 1);
 
+    // 🌟追加：履歴が空になったら小数の計算誤差を消すため、強制的に完全なゼロに戻す
+    if (history.length === 0) {
+        total = { p: 0, f: 0, c: 0, k: 0 };
+    } else {
+        // 念のため、マイナス数値にならないように0でストップをかける
+        total.p = Math.max(0, total.p);
+        total.f = Math.max(0, total.f);
+        total.c = Math.max(0, total.c);
+        total.k = Math.max(0, total.k);
+    }
+
     updateDisplay();
     updateChart();
     updateHistory();
     saveData();
     updateWeeklyChart();
-    
 }
 // AI解析ボタンから呼ばれる関数
 async function addAiFood() {
