@@ -220,7 +220,9 @@ h2 {
     position: fixed;
     top: 0;
     left: 0;
-    width: 340px;        /* 🌟 280px から 340px に広げました */
+    /* 🌟魔法の計算式: 画面の横幅(100vw)からタブの幅(75px)を引いたサイズにする */
+    width: calc(100vw - 75px);
+    max-width: 340px;          /* ただし、PCなど広い画面では最大340pxで止める */
     height: auto;
     max-height: 85vh;
     background-color: white;
@@ -233,7 +235,9 @@ h2 {
 
 /* 閉じている時は左に隠す（マイナス方向にずらす） */
 .drawer-closed {
-    transform: translateX(-340px);
+    /* 🌟 -340px ではなく -100%（自分自身の幅分だけ左に移動する）に変更！ */
+    /* これで幅が可変になっても、常にタブだけがピタッと顔を出すようになります */
+    transform: translateX(-100%); 
 }
 
 /* 開いている時は定位置に戻す */
@@ -244,15 +248,15 @@ h2 {
 /* はみ出しているタブのボタン */
 #drawerTab {
     position: absolute;
-    right: -75px;        /* 🌟 外に飛び出す幅を広げる (-40px から -75px に変更) */
-    top: 20px;
-    width: 75px;         /* 🌟 タブの横幅自体を広げる (40px から 75px に変更) */
+    right: -75px;
+    top: 0;              /* 🌟 20px から 0 に変更（ドロワーの上端とピタッと合わせる） */
+    width: 75px;
     background-color: #ff9800;
     color: white;
     font-weight: bold;
     font-size: 14px;
-    padding: 12px 0;     /* 🌟 バランスよく見えるように少し調整 */
-    border-radius: 0 10px 10px 0;
+    padding: 8px 0;      /* 🌟 12px から 8px に減らして、縦幅を少し短く（スリムに）しました */
+    border-radius: 0 0 10px 0; /* 🌟 天井にくっつくので、右上の丸みを無くし、右下だけ丸くしました */
     cursor: pointer;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
     text-align: center;

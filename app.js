@@ -916,7 +916,7 @@ function renderSuggestions() {
                 <span style="font-size: 11px; font-weight: bold; color: #4CAF50; background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">一致度: ${matchPercent}%</span>
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; background: white; padding: 6px; border-radius: 6px; border: 1px solid #eee;">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; background: white; padding: 6px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 8px;">
                 <div style="border-right: 1px solid #eee;">
                     <div style="font-size: 10px; color: #999;">P</div>
                     <div style="font-size: 13px; font-weight: bold; color: #FF6384;">${menu.p}g</div>
@@ -934,6 +934,10 @@ function renderSuggestions() {
                     <div style="font-size: 13px; font-weight: bold; color: #555;">${menu.k}</div>
                 </div>
             </div>
+
+            <button onclick="addSuggestedDinner('${menu.name}', ${menu.p}, ${menu.f}, ${menu.c}, ${menu.k})" style="width: 100%; padding: 8px; background-color: #ff9800; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                ＋ このメニューを追加
+            </button>
         `;
         
         listDiv.appendChild(card);
@@ -941,3 +945,34 @@ function renderSuggestions() {
 }
 
 window.toggleDinnerDrawer = toggleDinnerDrawer;
+
+function addSuggestedDinner(name, p, f, c, k) {
+    // 1. 今の合計に足し算
+    total.p += p;
+    total.f += f;
+    total.c += c;
+    total.k += k;
+
+    // 2. 履歴にデータを追加（名前の前に [提案] と付けておくとわかりやすいです）
+    history.push({
+        name: "[提案] " + name,
+        p: p,
+        f: f,
+        c: c,
+        k: k
+    });
+
+    // 3. アプリの画面とデータベースを更新
+    updateDisplay();
+    updateChart();
+    updateHistory();
+    saveData();
+    updateWeeklyChart();
+
+    // 4. ドロワーを閉じて、追加完了を知らせる
+    toggleDinnerDrawer();
+    alert(`「${name}」を食事履歴に追加しました！`);
+}
+
+// HTMLからこの関数を呼べるようにする
+window.addSuggestedDinner = addSuggestedDinner;
