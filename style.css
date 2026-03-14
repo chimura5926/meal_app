@@ -218,14 +218,14 @@ h2 {
 /* ====== 晩御飯提案ドロワー（タブ）のスタイル ====== */
 #dinnerDrawer {
     position: fixed;
-    top: 0;              /* 🌟 15% から 0 に変更（一番上にピタッとくっつく） */
+    top: 0;
     left: 0;
-    width: 280px;
+    width: 340px;        /* 🌟 280px から 340px に広げました */
     height: auto;
-    max-height: 85vh;    /* 🌟 上にスペースができた分、少し高さを広げました */
+    max-height: 85vh;
     background-color: white;
     box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-    border-radius: 0 0 12px 0; /* 🌟 上が天井にくっつくので、右下の角だけ丸くしました */
+    border-radius: 0 0 12px 0;
     transition: transform 0.3s ease-in-out;
     z-index: 1000;
     display: flex;
@@ -233,7 +233,7 @@ h2 {
 
 /* 閉じている時は左に隠す（マイナス方向にずらす） */
 .drawer-closed {
-    transform: translateX(-280px);
+    transform: translateX(-340px);
 }
 
 /* 開いている時は定位置に戻す */

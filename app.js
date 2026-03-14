@@ -911,10 +911,29 @@ function renderSuggestions() {
         const matchPercent = Math.round(menu.similarity * 100);
 
         card.innerHTML = `
-            <h4><span style="color:#ff9800;">${index + 1}位</span> ${menu.name}</h4>
-            <p><strong>P:</strong> ${menu.p}g / <strong>F:</strong> ${menu.f}g / <strong>C:</strong> ${menu.c}g</p>
-            <p><strong>カロリー:</strong> ${menu.k} kcal</p>
-            <p style="font-size: 11px; color: #999; margin-top: 5px;">PFCバランス一致度: ${matchPercent}%</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="margin: 0; font-size: 15px;"><span style="color:#ff9800;">${index + 1}位</span> ${menu.name}</h4>
+                <span style="font-size: 11px; font-weight: bold; color: #4CAF50; background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">一致度: ${matchPercent}%</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; background: white; padding: 6px; border-radius: 6px; border: 1px solid #eee;">
+                <div style="border-right: 1px solid #eee;">
+                    <div style="font-size: 10px; color: #999;">P</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #FF6384;">${menu.p}g</div>
+                </div>
+                <div style="border-right: 1px solid #eee;">
+                    <div style="font-size: 10px; color: #999;">F</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #FFCE56;">${menu.f}g</div>
+                </div>
+                <div style="border-right: 1px solid #eee;">
+                    <div style="font-size: 10px; color: #999;">C</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #36A2EB;">${menu.c}g</div>
+                </div>
+                <div>
+                    <div style="font-size: 10px; color: #999;">kcal</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #555;">${menu.k}</div>
+                </div>
+            </div>
         `;
         
         listDiv.appendChild(card);
