@@ -535,6 +535,7 @@ async function updateWeeklyChart() {
         },
         options: {
             responsive: true,
+            aspectRatio: 1.2,
             scales: {
                 x: { stacked: true },
                 y: { 
@@ -558,7 +559,9 @@ async function updateTwoMonthChart() {
 
     const weeks = 8;
     const labels = [];
-    const weeklyCalData = [];
+    const weeklyPData = []; // ★ 追加：Pの平均
+    const weeklyFData = []; // ★ 追加：Fの平均
+    const weeklyCData = []; // ★ 追加：Cの平均
     const weeklyWeightData = [];
 
     // データベースへのアクセス回数を減らして高速化するため、Promise.allで56日分を一気に取得
@@ -583,7 +586,9 @@ async function updateTwoMonthChart() {
 
     // 古い週(w=7)から新しい週(w=0)へ向かってループ
     for (let w = weeks - 1; w >= 0; w--) {
-        let sumCal = 0;
+        let sumP = 0; // ★ 修正
+        let sumF = 0; // ★ 修正
+        let sumC = 0; // ★ 修正
         let sumWeight = 0;
         let daysWithCal = 0;
         let daysWithWeight = 0;
@@ -593,8 +598,11 @@ async function updateTwoMonthChart() {
             const record = results[idx]?.data;
 
             if (record) {
-                if (record.total && record.total.k) {
-                    sumCal += record.total.k;
+                // その日にPFCいずれかの記録があれば集計対象にする
+                if (record.total && (record.total.p > 0 || record.total.f > 0 || record.total.c > 0 || record.total.k > 0)) {
+                    sumP += (record.total.p || 0) * 4; // カロリー換算
+                    sumF += (record.total.f || 0) * 9;
+                    sumC += (record.total.c || 0) * 4;
                     daysWithCal++;
                 }
                 if (record.weight) {
@@ -605,7 +613,9 @@ async function updateTwoMonthChart() {
         }
 
         // 平均の計算
-        const avgCal = daysWithCal > 0 ? (sumCal / daysWithCal) : 0;
+        const avgP = daysWithCal > 0 ? (sumP / daysWithCal) : 0;
+        const avgF = daysWithCal > 0 ? (sumF / daysWithCal) : 0;
+        const avgC = daysWithCal > 0 ? (sumC / daysWithCal) : 0;
         const avgWeight = daysWithWeight > 0 ? (sumWeight / daysWithWeight) : null;
 
         // X軸のラベル作成（例: "3/13週"）
@@ -615,7 +625,9 @@ async function updateTwoMonthChart() {
         const label = `${weekStartDate.getMonth() + 1}/${weekStartDate.getDate()}週`;
 
         labels.push(label);
-        weeklyCalData.push(avgCal);
+        weeklyPData.push(avgP); // ★ 修正
+        weeklyFData.push(avgF); // ★ 修正
+        weeklyCData.push(avgC); // ★ 修正
         weeklyWeightData.push(avgWeight);
     }
 
@@ -638,27 +650,26 @@ async function updateTwoMonthChart() {
                     spanGaps: true,
                     order: 1
                 },
-                {
-                    label: '平均カロリー (kcal)',
-                    data: weeklyCalData,
-                    backgroundColor: '#4CAF50', // 全体の総カロリーなので緑色で統一
-                    yAxisID: 'y',
-                    order: 2
-                }
+                // ★ 1週間グラフと同じようにPFCを分割して追加
+                { label: 'タンパク質', data: weeklyPData, backgroundColor: '#FF6384', yAxisID: 'y', order: 2 },
+                { label: '脂質', data: weeklyFData, backgroundColor: '#FFCE56', yAxisID: 'y', order: 2 },
+                { label: '炭水化物', data: weeklyCData, backgroundColor: '#36A2EB', yAxisID: 'y', order: 2 }
             ]
         },
         options: {
             responsive: true,
+            aspectRatio: 1.2,
             scales: {
-                x: { stacked: false },
+                x: { stacked: true }, // ★ 横軸を積み上げに変更
                 y: {
+                    stacked: true, // ★ 縦軸も積み上げに変更
                     position: 'left',
-                    title: { display: true, text: '平均カロリー', font: { size: 10 } }
+                    title: { display: true, text: '平均カロリー (kcal)', font: { size: 10 } }
                 },
                 y1: {
                     position: 'right',
                     grid: { drawOnChartArea: false },
-                    title: { display: true, text: '平均体重', font: { size: 10 } }
+                    title: { display: true, text: '平均体重 (kg)', font: { size: 10 } }
                 }
             },
             plugins: { datalabels: { display: false } }
