@@ -323,5 +323,13 @@
       }
     </script>
 
+    <div id="foodNameModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 25px 20px 20px 20px; border-radius: 12px; width: 80%; max-width: 320px; position: relative; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <button onclick="closeFoodNamePopup()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 22px; color: #999; cursor: pointer; padding: 0;">✖</button>
+            <p style="font-size: 13px; color: #666; margin: 0 0 10px 0;">登録した食事</p>
+            <h3 id="fullFoodNameText" style="margin: 0; font-size: 18px; color: #333; word-wrap: break-word; line-height: 1.4;">ここに名前が入ります</h3>
+        </div>
+    </div>
+
 </body>
 </html>

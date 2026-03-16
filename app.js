@@ -181,7 +181,7 @@ function updateHistory(){
         }
 
         row.innerHTML =
-            '<td class="food-name" title="' + displayName + '">' + displayName + "</td>" +
+            '<td class="food-name" onclick="showFoodNamePopup(\'' + displayName.replace(/'/g, "\\'") + '\')" style="color: #333; cursor: pointer;">' + displayName + "</td>" +
             "<td>" + food.p + "</td>" +
             "<td>" + food.f + "</td>" +
             "<td>" + food.c + "</td>" +
@@ -1218,3 +1218,18 @@ function startNotificationChecker() {
 }
 
 window.toggleNotifyTime = toggleNotifyTime;
+
+// ====== 食事名ポップアップ機能 ======
+function showFoodNamePopup(name) {
+    document.getElementById("fullFoodNameText").innerText = name;
+    // display: flex にすることで、画面のど真ん中に表示されます
+    document.getElementById("foodNameModal").style.display = "flex";
+}
+
+function closeFoodNamePopup() {
+    document.getElementById("foodNameModal").style.display = "none";
+}
+
+// HTMLから呼べるように登録
+window.showFoodNamePopup = showFoodNamePopup;
+window.closeFoodNamePopup = closeFoodNamePopup;
