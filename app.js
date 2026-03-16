@@ -57,21 +57,28 @@ let history = [];
 
 function addFood(){
     let f = document.getElementById("food").value;
-    
-    // 何も選択されていない（定番が空の）場合は処理を止める
     if (!f) {
         alert("追加する定番メニューがありません。履歴から登録してください。");
         return;
     }
 
+    // ★ 倍率を取得して掛け算する処理
+    let amount = parseFloat(document.getElementById("presetAmount").value) || 1;
     let food = foods[f];
 
-    total.p += food.p;
-    total.f += food.f;
-    total.c += food.c;
-    total.k += food.k;
+    let p = food.p * amount;
+    let f_val = food.f * amount;
+    let c = food.c * amount;
+    let k = food.k * amount;
 
-    history.push(f);
+    total.p += p;
+    total.f += f_val;
+    total.c += c;
+    total.k += k;
+
+    // 履歴には名前と倍率を一緒に保存
+    let displayName = amount !== 1 ? `${f} (${amount}人前)` : f;
+    history.push({ name: displayName, p: p, f: f_val, c: c, k: k });
 
     updateDisplay();
     updateChart();
@@ -114,37 +121,24 @@ function updateChart(){
 // app.js の末尾などに追加
 
 function addCustomFood() {
-    // 名前とPFCを取得
     const name = document.getElementById("customName").value;
-    const p = parseFloat(document.getElementById("customP").value) || 0;
-    const f = parseFloat(document.getElementById("customF").value) || 0;
-    const c = parseFloat(document.getElementById("customC").value) || 0;
+    if (!name) { alert("名前を入力してください"); return; }
 
-    // カロリーを自動計算 (P:4kcal, F:9kcal, C:4kcal)
+    // ★ 倍率を取得して掛け算する処理
+    const amount = parseFloat(document.getElementById("customAmount").value) || 1;
+    const p = (parseFloat(document.getElementById("customP").value) || 0) * amount;
+    const f = (parseFloat(document.getElementById("customF").value) || 0) * amount;
+    const c = (parseFloat(document.getElementById("customC").value) || 0) * amount;
     const k = (p * 4) + (f * 9) + (c * 4);
 
-    if (!name) {
-        alert("名前を入力してください");
-        return;
-    }
-
-    // 合計に加算
     total.p += p;
     total.f += f;
     total.c += c;
     total.k += k;
 
-    // 履歴に追加
-    history.push({
-        isCustom: true,
-        name: name,
-        p: p,
-        f: f,
-        c: c,
-        k: k
-    });
+    let displayName = amount !== 1 ? `${name} (${amount}倍)` : name;
+    history.push({ isCustom: true, name: displayName, p: p, f: f, c: c, k: k });
 
-    // 入力欄をクリア（kの入力欄は不要になるので削除してOK）
     document.getElementById("customName").value = "";
     document.getElementById("customP").value = "";
     document.getElementById("customF").value = "";
@@ -223,14 +217,20 @@ function removeFood(index){
 }
 // AI解析ボタンから呼ばれる関数
 async function addAiFood() {
-    const text = document.getElementById("aiText").value;
+    let text = document.getElementById("aiText").value; // const を let に変更
     const imageFile = document.getElementById("aiImage").files[0];
+    const aiAmount = document.getElementById("aiAmount").value; // ★ 追加
     const status = document.getElementById("aiStatus");
     const btn = document.getElementById("aiBtn");
 
     if (!text && !imageFile) {
         alert("料理名を入力するか、画像を添付してください");
         return;
+    }
+
+    // ★ 分量が入力されていれば、AIに送るテキストに追加する
+    if (aiAmount) {
+        text = text ? `${text} (※分量・食べた割合: ${aiAmount})` : `(※添付画像の分量・食べた割合: ${aiAmount})`;
     }
 
     status.innerText = "解析中...";
@@ -347,10 +347,10 @@ const toBase64 = file => new Promise((resolve, reject) => {
 async function saveData() {
     if (!currentUser) return;
     try {
-        // "records" というフォルダの中の "2026-03-13" などの日付ファイルに保存する
         await setDoc(doc(db, "users", currentUser.uid, "records", currentDate), {
             total: total,
-            history: history
+            history: history,
+            weight: currentWeight // ★ これを追加！
         });
         console.log(`${currentDate} のデータを保存しました！`);
     } catch (e) {
@@ -361,17 +361,21 @@ async function saveData() {
 async function loadData() {
     if (!currentUser) return;
     try {
-        // 現在選択されている日付（currentDate）のデータを読み込む
         const docSnap = await getDoc(doc(db, "users", currentUser.uid, "records", currentDate));
         if (docSnap.exists()) {
             const data = docSnap.data();
             total = data.total || {p:0, f:0, c:0, k:0};
             history = data.history || [];
+            currentWeight = data.weight || null; // ★ これを追加！
         } else {
-            // その日のデータが無ければ0にリセット
             total = {p:0, f:0, c:0, k:0};
             history = [];
+            currentWeight = null; // ★ これを追加！
         }
+        
+        // ★ 画面の入力欄に今日の体重をセットする
+        document.getElementById("dailyWeight").value = currentWeight || "";
+        
         updateDisplay();
         updateChart();
         updateHistory();
@@ -379,7 +383,6 @@ async function loadData() {
     } catch (e) {
         console.error("読み込みエラー: ", e);
     }
-    // 🌟 catchの外側でグラフを更新する
     updateWeeklyChart();
     updateTwoMonthChart();
 }
