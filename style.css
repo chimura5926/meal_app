@@ -88,6 +88,17 @@ display:block;
     margin: 20px auto;
 }
 
+/* 全てのグラフではなく、上の円グラフ（.chart-containerの中）だけに限定する！ */
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* 下の2つのグラフが震えないように、スマホ特有のハイライトを消す（おまけの安定化） */
+#weeklyChart, #twoMonthChart {
+    -webkit-tap-highlight-color: transparent;
+}
+
 canvas {
     width: 100% !important;
     height: 100% !important;
