@@ -426,7 +426,7 @@ async function updateWeeklyChart() {
     const fData = [];
     const cData = [];
     const wData = [];
-    const waterData = []; // ★ 水分用の配列
+    const waterData = []; 
 
     for (let i = 6; i >= 0; i--) {
         const d = new Date();
@@ -458,7 +458,6 @@ async function updateWeeklyChart() {
         }
     }
 
-    // ====== 既存のカロリー・体重グラフ ======
     const ctxWeekly = document.getElementById("weeklyChart").getContext("2d");
     if (weeklyChart) weeklyChart.destroy();
 
@@ -503,11 +502,9 @@ async function updateWeeklyChart() {
         }
     });
 
-    // ====== ★ 新しい水分グラフ ======
     const ctxWater = document.getElementById("waterWeeklyChart").getContext("2d");
     if (waterWeeklyChart) waterWeeklyChart.destroy();
 
-    // 7日分の目標ライン用の配列を作る
     const targetWaterArray = Array(7).fill(target.water || 0);
 
     waterWeeklyChart = new Chart(ctxWater, {
@@ -961,7 +958,7 @@ function suggestDinner() {
 
 window.suggestDinner = suggestDinner;
 
-// ▼▼ 変更部分：メニュードロワーの機能 ▼▼
+// ▼▼ 総合メニュードロワーの開閉 ▼▼
 function toggleMenuDrawer() {
     const drawer = document.getElementById("menuDrawer");
     
@@ -975,12 +972,69 @@ function toggleMenuDrawer() {
 }
 window.toggleMenuDrawer = toggleMenuDrawer;
 
+// ▼▼ AIおすすめメニュー用ポップアップの処理 ▼▼
 function openSuggestModal() {
-    alert("ステップ2でここにポップアップを作成します！");
-    toggleMenuDrawer();
+    toggleMenuDrawer(); // 横のメニューを閉じる
+    document.getElementById("suggestModal").style.display = "flex"; // ポップアップを開く
+    renderSuggestionsModal(); // おすすめを計算して描画
 }
 window.openSuggestModal = openSuggestModal;
-// ▲▲ 変更部分ここまで ▲▲
+
+function closeSuggestModal() {
+    document.getElementById("suggestModal").style.display = "none";
+}
+window.closeSuggestModal = closeSuggestModal;
+
+function renderSuggestionsModal() {
+    const top3 = suggestDinner(); 
+    const listDiv = document.getElementById("suggestListModal");
+    
+    listDiv.innerHTML = ""; 
+    
+    if (top3.length === 0) {
+        listDiv.innerHTML = "<p>データがありません。</p>";
+        return;
+    }
+
+    top3.forEach((menu, index) => {
+        const card = document.createElement("div");
+        card.className = "suggest-card";
+        
+        const matchPercent = Math.round(menu.similarity * 100);
+
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <h4 style="margin: 0; font-size: 15px; padding-right: 8px;"><span style="color:#ff9800;">${index + 1}位</span> ${menu.name}</h4>
+                <span style="font-size: 11px; font-weight: bold; color: #4CAF50; background: #e8f5e9; padding: 2px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">一致度: ${matchPercent}%</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; background: white; padding: 6px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 8px;">
+                <div style="border-right: 1px solid #eee;">
+                    <div style="font-size: 10px; color: #999;">P</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #FF6384;">${menu.p}g</div>
+                </div>
+                <div style="border-right: 1px solid #eee;">
+                    <div style="font-size: 10px; color: #999;">F</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #FFCE56;">${menu.f}g</div>
+                </div>
+                <div style="border-right: 1px solid #eee;">
+                    <div style="font-size: 10px; color: #999;">C</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #36A2EB;">${menu.c}g</div>
+                </div>
+                <div>
+                    <div style="font-size: 10px; color: #999;">kcal</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #555;">${menu.k}</div>
+                </div>
+            </div>
+
+            <button onclick="addSuggestedDinner('${menu.name}', ${menu.p}, ${menu.f}, ${menu.c}, ${menu.k})" style="width: 100%; padding: 8px; background-color: #ff9800; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                食事履歴に追加
+            </button>
+        `;
+        listDiv.appendChild(card);
+    });
+}
+window.renderSuggestionsModal = renderSuggestionsModal;
 
 function addSuggestedDinner(name, p, f, c, k) {
     total.p += p;
@@ -1002,7 +1056,8 @@ function addSuggestedDinner(name, p, f, c, k) {
     saveData();
     updateWeeklyChart();
 
-    // おすすめを追加したらドロワーを閉じる処理（ステップ3で調整予定）
+    closeSuggestModal(); // 追加したらポップアップを閉じる
+    alert("「" + name + "」を食事履歴に追加しました！");
 }
 window.addSuggestedDinner = addSuggestedDinner;
 

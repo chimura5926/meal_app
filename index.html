@@ -120,8 +120,8 @@
     <div id="appScreen" style="display: none;">
         
         <div id="menuDrawer" class="drawer-closed">
-            <div id="drawerTab" onclick="toggleMenuDrawer()">
-                メニュー<br>≡
+            <div id="drawerTab" onclick="toggleMenuDrawer()" style="font-size: 28px; line-height: 1.2;">
+                ≡
             </div>
             
             <div id="drawerContent">
@@ -133,17 +133,17 @@
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     
                     <button onclick="openSuggestModal()" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                        <span>AIおすすめメニュー</span>
+                        <span>✨ AIおすすめメニュー</span>
                         <span style="color: #999;">＞</span>
                     </button>
                     
                     <button onclick="alert('準備中です！将来ここに新着情報が出ます。')" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                        <span>新着情報・お知らせ</span>
+                        <span>📢 新着情報・お知らせ</span>
                         <span style="color: #999;">＞</span>
                     </button>
 
                     <button onclick="editProfile(); toggleMenuDrawer();" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                        <span>プロフィール設定</span>
+                        <span>⚙️ プロフィール設定</span>
                         <span style="color: #999;">＞</span>
                     </button>
                 </div>
@@ -153,7 +153,6 @@
             <input type="date" id="datePicker" onchange="changeDate()" style="font-size: 16px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 60%;">
             
             <div style="display: flex; gap: 15px; margin-top: 5px;">
-                <button onclick="editProfile()" style="background-color: #2196F3; color: white; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-weight: bold;">プロフィール設定</button>
                 <button id="logoutBtn" onclick="logout()" style="padding: 10px 18px;">ログアウト</button>
             </div>
         </div>
@@ -303,7 +302,7 @@
         </table>
 
         <h2 style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; margin-bottom: 10px;">
-            <span>水分摂取量</span>
+            <span>💧 水分摂取量</span>
             <span style="font-size: 12px; color: #666; font-weight: normal;">目標: 体重 × 35ml</span>
         </h2>
         <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
@@ -325,6 +324,7 @@
         <div style="width: 100%; max-width: 800px; margin: auto; margin-bottom: 50px;">
             <canvas id="waterWeeklyChart"></canvas>
         </div>
+
         <h2 style="margin-top: 40px; margin-bottom: 15px;">栄養バランス</h2>
         <div class="chart-container" style="margin-bottom: 40px;">
             <canvas id="pfcChart" width="100" height="100"></canvas>
@@ -367,5 +367,18 @@
         </div>
     </div>
 
-</body>
+    <div id="suggestModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="margin: 0; font-size: 18px; color: #4CAF50;">✨ AIおすすめメニュー</h3>
+                <button onclick="closeSuggestModal()" style="background: none; border: none; font-size: 22px; color: #999; cursor: pointer; padding: 0;">✖</button>
+            </div>
+            <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 15px; line-height: 1.4;">不足している栄養をピッタリ補えるメニュー（トップ3）</p>
+            
+            <div id="suggestListModal">
+                <p style="text-align: center; color: #999; padding: 20px 0;">計算中...</p>
+            </div>
+        </div>
+    </div>
+    </body>
 </html>
