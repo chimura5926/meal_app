@@ -1,52 +1,53 @@
-body{
-font-family:sans-serif;
-text-align:center;
-margin:20px;           /* 少し余白を減らして横幅を広く使う */
-font-size:16px;        /* 🌟全体の文字を少し大きく */
-padding-bottom: 80px;  /* ★追加：一番下に「ゆとり」を作ってグラフの震えを防ぐ */
-overflow-x: hidden;    /* ★追加：見えない横揺れを完全に防ぐ */
+body {
+    font-family: sans-serif;
+    text-align: center;
+    margin: 20px;
+    font-size: 16px;
+    padding-bottom: 80px;  /* 一番下に「ゆとり」を作ってグラフの震えを防ぐ */
+    overflow-x: hidden;    /* 見えない横揺れを完全に防ぐ */
 }
 
 h1 {
-    font-size: 32px;      /* 🌟フォントを大きく（お好みに合わせて30〜36pxで調整してください） */
-    margin-top: 10px;    /* 画面上部との隙間 */
-    margin-bottom: 5px;  /* 🌟下のインストールボタンや日付との間隔をギュッと詰める */
-    color: #4CAF50;      /* アプリのテーマカラー（緑） */
+    font-size: 32px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #4CAF50;
 }
 
-/* ついでに日付エリア（appScreenの最初のdiv）も上部を詰めましょう */
 #appScreen > div:first-child {
-    margin-top: 0;       /* 🌟さらに隙間をなくす */
+    margin-top: 0;
     padding-top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
 }
 
-button{
-font-size:14px;        /* 🌟少し大きく */
-padding:4px 8px;
+button {
+    font-size: 14px;
+    padding: 4px 8px;
 }
 
-/* 1. 全体のselect指定を修正（または上書き） */
 select {
-    font-size: 14px;      /* 🌟フォントを小さく */
+    font-size: 14px;
     padding: 6px;
-    width: 60%;           /* 🌟横幅を小さく（お好みで 50%〜70% に調整） */
-    margin: 0 auto 10px;  /* 🌟真ん中に寄せる */
-    display: block;       /* 🌟中央寄せを有効にするために必要 */
-    text-align: center;   /* 🌟文字を真ん中にそろえる（ブラウザにより制限あり） */
+    width: 60%;
+    margin: 0 auto 10px;
+    display: block;
+    text-align: center;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-/* 2. もしプルダウン内のテキストが左に寄る場合は以下も追加 */
 select option {
     text-align: center;
 }
 
-#pfcChart{
-width:320px;           /* 🌟少し拡大 */
-height:320px;
-margin:auto;
-display:block;
+#pfcChart {
+    width: 320px;
+    height: 320px;
+    margin: auto;
+    display: block;
 }
 
 /* ===== テーブルのスマホ最適化 ===== */
@@ -55,7 +56,7 @@ display:block;
     margin: auto;
     border-collapse: collapse;
     width: 100%;
-    max-width: 600px;  /* 🌟横幅を少し広げる */
+    max-width: 600px;
     margin-bottom: 20px;
     table-layout: fixed;
 }
@@ -65,13 +66,12 @@ display:block;
 #totalTable th,
 #totalTable td {
     border: 1px solid #ccc;
-    padding: 8px 4px;     /* 🌟少し広げる */
+    padding: 8px 4px;
     text-align: center;
-    font-size: 14px;      /* 🌟文字を大きく */
+    font-size: 14px;
     word-wrap: break-word;
 }
 
-/* 1列目 */
 #historyTable th:first-child,
 #historyTable td:first-child,
 #totalTable th:first-child,
@@ -80,33 +80,29 @@ display:block;
     font-size: 13px;
 }
 
+/* 上の円グラフ（PFCバランス）用の枠 */
 .chart-container {
     position: relative;
-    width: 95%;          /* 🌟横幅拡大 */
+    width: 95%;
     max-width: 450px;
     height: 320px;
     margin: 20px auto;
 }
 
-/* 全てのグラフではなく、上の円グラフ（.chart-containerの中）だけに限定する！ */
+/* 上の円グラフだけに100%を適用する */
 .chart-container canvas {
     width: 100% !important;
     height: 100% !important;
 }
 
-/* 下の2つのグラフが震えないように、スマホ特有のハイライトを消す（おまけの安定化） */
+/* 下の2つのグラフが震えないように、スマホ特有のハイライトを消す */
 #weeklyChart, #twoMonthChart {
     -webkit-tap-highlight-color: transparent;
 }
 
-canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
-
 /* タブボタン */
 .input-tabs button {
-    padding: 10px 18px;   /* 🌟押しやすく */
+    padding: 10px 18px;
     font-size: 15px;
     cursor: pointer;
     border: 1px solid #4CAF50;
@@ -123,46 +119,34 @@ canvas {
 }
 
 .food-name {
-    max-width: 140px;   /* 幅調整 */
+    max-width: 140px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 /* ===== 表のPFC色分け（背景のみ・文字は黒） ===== */
-
-/* P（タンパク質）の列：うすい赤の背景 */
 #totalTable th:nth-child(2), #totalTable td:nth-child(2),
 #historyTable th:nth-child(2), #historyTable td:nth-child(2) {
     background-color: rgba(255, 99, 132, 0.15); 
 }
 
-/* F（脂質）の列：うすい黄色の背景 */
 #totalTable th:nth-child(3), #totalTable td:nth-child(3),
 #historyTable th:nth-child(3), #historyTable td:nth-child(3) {
     background-color: rgba(255, 206, 86, 0.2); 
 }
 
-/* C（炭水化物）の列：うすい青の背景 */
 #totalTable th:nth-child(4), #totalTable td:nth-child(4),
 #historyTable th:nth-child(4), #historyTable td:nth-child(4) {
     background-color: rgba(54, 162, 235, 0.15); 
 }
 
-#appScreen > div:first-child {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* 🌟これでプロフィール設定などの高さが中央に揃います */
-    padding: 10px 5px;
-}
-
-/* ログアウトボタンの形を整える */
 #logoutBtn {
-    background-color: #f44336; /* わかりやすく赤系に（お好みで変えてください） */
+    background-color: #f44336;
     color: white;
     border: none;
     padding: 6px 12px;
-    border-radius: 4px; /* 四角すぎず丸すぎず */
+    border-radius: 4px;
     font-size: 13px;
     font-weight: bold;
     cursor: pointer;
@@ -173,7 +157,6 @@ canvas {
     background-color: #d32f2f;
 }
 
-/* プロフィール設定ボタンも共通の高さに */
 button[onclick="editProfile()"] {
     font-size: 13px;
     padding: 6px 12px;
@@ -183,59 +166,41 @@ button[onclick="editProfile()"] {
 .input-area input[type="text"],
 .input-area input[type="number"],
 .input-area select {
-    font-size: 16px !important; /* 手動追加のサイズに合わせる */
-    padding: 10px !important;   /* 余白を揃えて押しやすくする */
+    font-size: 16px !important;
+    padding: 10px !important;
     box-sizing: border-box;
 }
 
-/* AI解析中のステータス文字も少し調整 */
 #aiStatus {
     font-size: 14px;
     margin-top: 10px;
 }
 
 h2 {
-    margin-top: 30px;    /* 前の要素との間隔（セクションの区切り） */
-    margin-bottom: 5px;  /* 🌟直後の表やグラフとの間隔をギュッと詰める */
+    margin-top: 30px;
+    margin-bottom: 5px;
     font-size: 1.1rem;
     border-bottom: 1px solid #eee;
-    display: block;      /* 幅いっぱいに線を引く */
-    text-align: left;    /* 左寄せにすると表との一体感が出ます */
+    display: block;
+    text-align: left;
     padding-bottom: 3px;
 }
 
-/* 入力エリアの下の余白 */
 .input-area {
     margin-bottom: 20px !important;
 }
 
-/* グラフコンテナの設定 */
-.chart-container {
-    margin-top: 0px !important;    /* タイトルに近づける */
-    margin-bottom: 20px !important;
-}
-
-/* 棒グラフの設定 */
 #weeklyChart {
-    margin-top: 10px !important;   /* タイトルに近づける */
+    margin-top: 10px !important;
     margin-bottom: 30px !important;
 }
 
-/* テーブルの設定 */
-#totalTable, 
-#historyTable {
-    margin-top: 5px !important;    /* タイトルに近づける */
-    margin-bottom: 20px !important;
-}
-
-/* ====== 晩御飯提案ドロワー（タブ）のスタイル ====== */
 #dinnerDrawer {
     position: fixed;
     top: 0;
     left: 0;
-    /* 🌟魔法の計算式: 画面の横幅(100vw)からタブの幅(75px)を引いたサイズにする */
     width: calc(100vw - 75px);
-    max-width: 340px;          /* ただし、PCなど広い画面では最大340pxで止める */
+    max-width: 340px;
     height: auto;
     max-height: 85vh;
     background-color: white;
@@ -246,30 +211,25 @@ h2 {
     display: flex;
 }
 
-/* 閉じている時は左に隠す（マイナス方向にずらす） */
 .drawer-closed {
-    /* 🌟 -340px ではなく -100%（自分自身の幅分だけ左に移動する）に変更！ */
-    /* これで幅が可変になっても、常にタブだけがピタッと顔を出すようになります */
     transform: translateX(-100%); 
 }
 
-/* 開いている時は定位置に戻す */
 .drawer-open {
     transform: translateX(0);
 }
 
-/* はみ出しているタブのボタン */
 #drawerTab {
     position: absolute;
     right: -75px;
-    top: 0;              /* 🌟 20px から 0 に変更（ドロワーの上端とピタッと合わせる） */
+    top: 0;
     width: 75px;
     background-color: #ff9800;
     color: white;
     font-weight: bold;
     font-size: 14px;
-    padding: 8px 0;      /* 🌟 12px から 8px に減らして、縦幅を少し短く（スリムに）しました */
-    border-radius: 0 0 10px 0; /* 🌟 天井にくっつくので、右上の丸みを無くし、右下だけ丸くしました */
+    padding: 8px 0;
+    border-radius: 0 0 10px 0;
     cursor: pointer;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
     text-align: center;
@@ -279,10 +239,9 @@ h2 {
 #drawerContent {
     width: 100%;
     padding: 15px;
-    overflow-y: auto;    /* メニューがはみ出たらスクロール */
+    overflow-y: auto;
 }
 
-/* 提案されるメニューカードのデザイン */
 .suggest-card {
     border: 1px solid #ddd;
     border-radius: 8px;
