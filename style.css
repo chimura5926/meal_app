@@ -222,9 +222,9 @@ h2 {
 
 #drawerTab {
     position: absolute;
-    right: -75px;
+    right: -50px;  /* ← 75px から 50px に変更（枠の幅と合わせる） */
     top: 0;
-    width: 75px;
+    width: 50px;   /* ← 75px から 50px に変更（枠の幅） */
     background-color: #ff9800;
     color: white;
     font-weight: bold;
