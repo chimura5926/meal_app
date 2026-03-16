@@ -1131,7 +1131,6 @@ function closeFoodNamePopup() {
 window.showFoodNamePopup = showFoodNamePopup;
 window.closeFoodNamePopup = closeFoodNamePopup;
 
-// ====== ★ 水分摂取量の追加機能 ======
 function addWater(amount) {
     total.water = (total.water || 0) + amount;
     if (total.water < 0) total.water = 0; 
@@ -1147,3 +1146,21 @@ function addWater(amount) {
     }
 }
 window.addWater = addWater;
+
+// 自由に入力した水分量を追加する処理
+function addCustomWater() {
+    const input = document.getElementById("customWaterAmount");
+    const amount = parseFloat(input.value);
+    
+    if (!amount || isNaN(amount)) {
+        alert("追加する水分量を入力してください。");
+        return;
+    }
+    
+    // 入力された数値を addWater に渡して追加
+    addWater(amount);
+    
+    // 追加が終わったら入力欄を空っぽに戻す
+    input.value = "";
+}
+window.addCustomWater = addCustomWater;

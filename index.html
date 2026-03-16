@@ -133,17 +133,17 @@
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     
                     <button onclick="openSuggestModal()" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                        <span>✨ AIおすすめメニュー</span>
+                        <span>AIおすすめメニュー</span>
                         <span style="color: #999;">＞</span>
                     </button>
                     
                     <button onclick="alert('準備中です！将来ここに新着情報が出ます。')" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                        <span>📢 新着情報・お知らせ</span>
+                        <span>新着情報・お知らせ</span>
                         <span style="color: #999;">＞</span>
                     </button>
 
                     <button onclick="editProfile(); toggleMenuDrawer();" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                        <span>⚙️ プロフィール設定</span>
+                        <span>プロフィール設定</span>
                         <span style="color: #999;">＞</span>
                     </button>
                 </div>
@@ -302,7 +302,7 @@
         </table>
 
         <h2 style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; margin-bottom: 10px;">
-            <span>💧 水分摂取量</span>
+            <span>水分摂取量</span>
             <span style="font-size: 12px; color: #666; font-weight: normal;">目標: 体重 × 35ml</span>
         </h2>
         <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
@@ -314,10 +314,17 @@
                 <div id="waterProgressBar" style="width: 0%; background-color: #2196F3; height: 100%; border-radius: 10px; transition: width 0.3s ease;"></div>
             </div>
             
-            <div style="display: flex; justify-content: center; gap: 10px;">
-                <button onclick="addWater(200)" style="background-color: #42a5f5; color: white; border: none; padding: 12px 15px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">+200ml コップ</button>
-                <button onclick="addWater(500)" style="background-color: #1e88e5; color: white; border: none; padding: 12px 15px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">+500ml ペット</button>
-                <button onclick="addWater(-200)" style="background-color: #90caf9; color: white; border: none; padding: 12px 10px; border-radius: 6px; font-size: 13px;">- 修正</button>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button onclick="addWater(200)" style="background-color: #42a5f5; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">+ 200 ml</button>
+                    <button onclick="addWater(500)" style="background-color: #1e88e5; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">+ 500 ml</button>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    <input type="number" id="customWaterAmount" placeholder="指定量" style="width: 90px; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; text-align: center;">
+                    <span style="font-size: 14px; color: #333;">ml</span>
+                    <button onclick="addCustomWater()" style="background-color: #4CAF50; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">追加</button>
+                    <button onclick="addWater(-200)" style="background-color: #90caf9; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 13px; margin-left: 5px;">- 200 ml</button>
+                </div>
             </div>
         </div>
         
