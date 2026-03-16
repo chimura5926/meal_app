@@ -195,7 +195,8 @@ h2 {
     margin-bottom: 30px !important;
 }
 
-#dinnerDrawer {
+/* ▼▼ IDを dinnerDrawer から menuDrawer に変更 ▼▼ */
+#menuDrawer {
     position: fixed;
     top: 0;
     left: 0;

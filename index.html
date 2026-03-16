@@ -119,20 +119,33 @@
 
     <div id="appScreen" style="display: none;">
         
-        <div id="dinnerDrawer" class="drawer-closed">
-            <div id="drawerTab" onclick="toggleDinnerDrawer()">
-                おすすめ<br>メニュー
+        <div id="menuDrawer" class="drawer-closed">
+            <div id="drawerTab" onclick="toggleMenuDrawer()">
+                メニュー<br>≡
             </div>
             
             <div id="drawerContent">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; color: #4CAF50;">AIおすすめメニュー</h3>
-                    <button onclick="toggleDinnerDrawer()" style="background:none; border:none; font-size:22px; cursor:pointer; color: #999; padding: 5px;">✖</button>
+                    <h3 style="margin: 0; font-size: 18px; color: #333;">メニュー</h3>
+                    <button onclick="toggleMenuDrawer()" style="background:none; border:none; font-size:22px; cursor:pointer; color: #999; padding: 5px;">✖</button>
                 </div>
-                <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 15px; line-height: 1.4;">不足している栄養をピッタリ補えるメニュー（トップ3）</p>
                 
-                <div id="suggestList">
-                    <p style="text-align: center; color: #999; padding: 20px 0;">計算中...</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    
+                    <button onclick="openSuggestModal()" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <span>AIおすすめメニュー</span>
+                        <span style="color: #999;">＞</span>
+                    </button>
+                    
+                    <button onclick="alert('準備中です！将来ここに新着情報が出ます。')" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <span>新着情報・お知らせ</span>
+                        <span style="color: #999;">＞</span>
+                    </button>
+
+                    <button onclick="editProfile(); toggleMenuDrawer();" style="background-color: #f9f9f9; color: #333; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <span>プロフィール設定</span>
+                        <span style="color: #999;">＞</span>
+                    </button>
                 </div>
             </div>
         </div>
