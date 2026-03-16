@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>FitNavi | AIで簡単！PFCバランス計算＆食事管理アプリ</title>
+    <meta name="description" content="FitNavi(フィットナビ)は、写真やテキストからAIがカロリーとPFCバランス(タンパク質・脂質・炭水化物)を自動解析する無料の食事管理・ダイエットアプリです。あなた専用の目標計算や、おすすめメニューの提案機能も搭載！">
+    <meta name="keywords" content="食事管理, PFCバランス, カロリー計算, AI, ダイエット, 筋トレ, 無料, アプリ">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="stylesheet" href="style.css">
-    <title>食事管理</title>
 </head>
 
 <body>
@@ -17,9 +20,23 @@
             スマホにアプリを追加
         </button>
     </div>
-    <div id="loginScreen" style="text-align: center; margin-top: 50px;">
-        <p>食事の記録を保存するにはログインしてください。</p>
-        <button id="loginBtn" onclick="login()" style="font-size: 18px; padding: 10px 20px;">Googleでログイン</button>
+    <div id="loginScreen" style="text-align: center; margin-top: 30px; padding: 0 15px;">
+        <h2 style="color: #4CAF50; font-size: 20px; border: none;">AIがあなたの食事管理をサポート！</h2>
+        
+        <p style="font-size: 14px; color: #555; max-width: 400px; margin: 0 auto 20px auto; text-align: left; line-height: 1.6;">
+            <strong>FitNavi（フィットナビ）</strong>は、ダイエットや筋トレを頑張る人のための食事記録アプリです。<br><br>
+            <strong>写真・テキストでAI自動解析</strong><br>
+            食べたものを入力するだけで、AIがカロリーとPFCバランスを即座に計算。<br>
+            <strong>あなた専用の目標設定</strong><br>
+            身長や体重、目的に合わせた最適な栄養素を自動算出します。<br>
+            <strong>AIによるおすすめメニュー提案</strong><br>
+            その日の「足りない栄養素」を補う完璧な晩御飯を提案してくれます！
+        </p>
+
+        <p style="font-size: 14px; font-weight: bold;">▼ 記録を保存して始める ▼</p>
+        <button id="loginBtn" onclick="login()" style="font-size: 18px; padding: 12px 24px; background-color: #4285F4; color: white; border: none; border-radius: 5px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            Googleでログイン
+        </button>
     </div>
 
     <div id="profileScreen" style="display: none; text-align: center; margin-top: 30px;">
