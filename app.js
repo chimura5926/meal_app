@@ -5,6 +5,7 @@ let currentUser = null;
 let weeklyChart;
 let twoMonthChart;
 let foods = {};
+let currentWeight = null; // ★ この1行を追加！
 
 function getTodayString() {
     const now = new Date();
@@ -890,6 +891,7 @@ window.switchInputMethod = switchInputMethod;
 window.addPresetFromHistory = addPresetFromHistory;
 window.saveProfile = saveProfile;
 window.editProfile = editProfile;
+window.saveWeight = saveWeight;
 
 // 1. iPhoneかどうかを判定
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
