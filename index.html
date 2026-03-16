@@ -115,13 +115,12 @@
             <p style="font-size:12px;color:#666;margin-top:0;margin-bottom:8px;">
             ※新しい定番メニューは、下部の「食事履歴」にある「✓」ボタンを押して追加してください。
             </p>
-            <div style="margin-bottom: 10px; font-size: 14px;">
-                分量: <input type="number" id="presetAmount" value="1" step="0.1" min="0.1" style="width: 60px; padding: 5px; font-size: 16px;"> 人前
-            </div>
             <select id="food" style="width:90%; padding:10px; margin-bottom:10px;">
                 <option value="" disabled selected>登録されている定番がありません</option>
             </select>
-
+            <div style="margin-bottom: 10px; font-size: 14px;">
+                分量: <input type="number" id="presetAmount" value="1" step="0.1" min="0.1" style="width: 60px; padding: 5px; font-size: 16px;"> 人前
+            </div>
             <div style="text-align:center;">
                 <button onclick="addFood()" style="background-color:#4CAF50;color:white;border:none;padding:8px 20px;border-radius:6px;font-size:15px;">追加</button>
             </div>
@@ -190,10 +189,10 @@
 
         </div>
 
-        <h2>今日の合計</h2>
-        <p style="font-size: 12px; color: #666; text-align: right; margin: -10px 0 5px 0;">
-            ※ P:タンパク質 / F:脂質 / C:炭水化物
-        </p>
+        <h2 style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <span>今日の合計</span>
+            <span style="font-size: 12px; color: #666; font-weight: normal;">※ P:タンパク質 / F:脂質 / C:炭水化物</span>
+        </h2>
         <table id="totalTable">
             <thead>
                 <tr>
@@ -229,10 +228,10 @@
             </tbody>
         </table>
 
-        <h2>食事履歴</h2>
-        <p style="font-size: 12px; color: #666; text-align: right; margin: -10px 0 5px 0;">
-            ※ P:タンパク質 / F:脂質 / C:炭水化物
-        </p>
+        <h2 style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <span>食事履歴</span>
+            <span style="font-size: 12px; color: #666; font-weight: normal;">※ P:タンパク質 / F:脂質 / C:炭水化物</span>
+        </h2>
         <table id="historyTable">
             <thead>
                 <tr>
@@ -273,7 +272,6 @@
     <script type="module" src="firebase.js"></script>
     <script type="module" src="app.js"></script>
     <script>
-      // スマホがPWA（アプリ化）に対応しているかチェックして起動する
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('service-worker.js')
