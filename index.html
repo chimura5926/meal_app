@@ -24,7 +24,7 @@
 
     <div id="profileScreen" style="display: none; text-align: center; margin-top: 30px;">
         <h2>あなたの情報を教えてください</h2>
-        <p style="font-size: 14px; color: #666;">最適なPFCバランスとカロリーを計算するために必要です。</p>
+        <p style="font-size: 14px; color: #666;">1日に必要なカロリーと栄養素（タンパク質など）を計算します。</p>
         
         <div style="margin: 20px auto; text-align: left; max-width: 300px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
             
@@ -87,7 +87,7 @@
                     <h3 style="margin: 0; font-size: 18px; color: #4CAF50;">AIおすすめメニュー</h3>
                     <button onclick="toggleDinnerDrawer()" style="background:none; border:none; font-size:20px; cursor:pointer; color: #999;">✖</button>
                 </div>
-                <p style="font-size: 13px; color: #666; margin-top: 0;">残りPFCバランスに一番近いメニュー（トップ3）</p>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">不足している栄養をピッタリ補えるメニュー（トップ3）</p>
                 
                 <div id="suggestList">
                     <p style="text-align: center; color: #999;">計算中...</p>
@@ -110,12 +110,14 @@
         </div>
 
         <div id="presetArea" class="input-area" style="margin-top:15px;border:1px solid #ccc;padding:10px;border-radius:8px;">
+
+            <h3 style="margin-top:0;margin-bottom:5px;font-size:16px;">定番から追加</h3>
+            <p style="font-size:12px;color:#666;margin-top:0;margin-bottom:8px;">
+            ※新しい定番メニューは、下部の「食事履歴」にある「✓」ボタンを押して追加してください。
+            </p>
             <div style="margin-bottom: 10px; font-size: 14px;">
                 分量: <input type="number" id="presetAmount" value="1" step="0.1" min="0.1" style="width: 60px; padding: 5px; font-size: 16px;"> 人前
             </div>
-
-            <h3 style="margin-top:0;margin-bottom:5px;font-size:16px;">定番から追加</h3>
-
             <select id="food" style="width:90%; padding:10px; margin-bottom:10px;">
                 <option value="" disabled selected>登録されている定番がありません</option>
             </select>
@@ -126,21 +128,30 @@
         </div>
 
         <div id="customArea" class="input-area" style="display:none;margin-top:15px;border:1px solid #ccc;padding:10px;border-radius:8px;">
-            <div style="margin-bottom: 10px; font-size: 14px;">
-                分量: <input type="number" id="customAmount" value="1" step="0.1" min="0.1" style="width: 60px; padding: 5px; font-size: 16px;"> 倍
-            </div>
 
             <h3 style="margin-top:0;margin-bottom:5px;font-size:16px;">手動追加</h3>
 
             <div style="text-align:center">
                 <input type="text" id="customName" placeholder="食材名" style="width:90%;padding:10px;font-size:16px;margin-bottom:10px;">
 
-                <div style="display:flex;justify-content:center;gap:10px;">
-                    <input type="number" id="customP" placeholder="P" style="width:70px;padding:8px;font-size:15px;">
-                    <input type="number" id="customF" placeholder="F" style="width:70px;padding:8px;font-size:15px;">
-                    <input type="number" id="customC" placeholder="C" style="width:70px;padding:8px;font-size:15px;">
+                <div style="display:flex;justify-content:center;gap:10px;text-align:center;">
+                    <div>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 3px;">タンパク質</div>
+                        <input type="number" id="customP" placeholder="P (g)" style="width:70px;padding:8px;font-size:15px;box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 3px;">脂質</div>
+                        <input type="number" id="customF" placeholder="F (g)" style="width:70px;padding:8px;font-size:15px;box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 3px;">炭水化物</div>
+                        <input type="number" id="customC" placeholder="C (g)" style="width:70px;padding:8px;font-size:15px;box-sizing:border-box;">
+                    </div>
                 </div>
 
+                <div style="margin-top: 10px; margin-bottom: 10px; font-size: 14px;">
+                    分量: <input type="number" id="customAmount" value="1" step="0.1" min="0.1" style="width: 60px; padding: 5px; font-size: 16px;"> 倍
+                </div>
                 <button onclick="addCustomFood()" style="margin-top:10px;background-color:#4CAF50;color:white;border:none;padding:8px 20px;border-radius:6px;">追加</button>
             </div>
         </div>
@@ -180,6 +191,9 @@
         </div>
 
         <h2>今日の合計</h2>
+        <p style="font-size: 12px; color: #666; text-align: right; margin: -10px 0 5px 0;">
+            ※ P:タンパク質 / F:脂質 / C:炭水化物
+        </p>
         <table id="totalTable">
             <thead>
                 <tr>
@@ -216,6 +230,9 @@
         </table>
 
         <h2>食事履歴</h2>
+        <p style="font-size: 12px; color: #666; text-align: right; margin: -10px 0 5px 0;">
+            ※ P:タンパク質 / F:脂質 / C:炭水化物
+        </p>
         <table id="historyTable">
             <thead>
                 <tr>
@@ -231,7 +248,7 @@
             <tbody id="history"></tbody>
         </table>
 
-        <h2>PFCバランス</h2>
+        <h2>栄養バランス (タンパク質・脂質・炭水化物)</h2>
         <div class="chart-container">
             <canvas id="pfcChart" width="100" height="100"></canvas>
         </div>

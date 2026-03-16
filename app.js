@@ -897,7 +897,7 @@ window.saveWeight = saveWeight;
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
 // 2. すでにホーム画面からアプリとして起動しているかを判定
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standabunnryoulone;
 
 // もしすでにアプリとして開かれていたら、インストールボタンを隠す
 if (isStandalone) {
