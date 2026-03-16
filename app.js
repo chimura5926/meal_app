@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc, collection, query, limit, getDocs, orderBy } from 
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 let currentUser = null;
 let weeklyChart;
+let twoMonthChart;
 let foods = {};
 
 function getTodayString() {
@@ -380,6 +381,7 @@ async function loadData() {
     }
     // 🌟 catchの外側でグラフを更新する
     updateWeeklyChart();
+    updateTwoMonthChart();
 }
 
 // ページが開かれたときに自動でデータを読み込む
@@ -473,69 +475,192 @@ async function updateWeeklyChart() {
     const pData = [];
     const fData = [];
     const cData = [];
+    const wData = []; // 体重用配列
 
-    // 今日から遡って7日分のデータを準備
     for (let i = 6; i >= 0; i--) {
         const d = new Date();
         const tzoffset = d.getTimezoneOffset() * 60000;
         const dateObj = new Date(d - tzoffset - (i * 24 * 60 * 60 * 1000));
         const dateStr = dateObj.toISOString().split('T')[0];
         
-        labels.push(dateStr.slice(5)); // "2026-03-13" -> "03-13"
+        labels.push(dateStr.slice(5));
 
-        // ★ 今日(表示している日付)の場合は、即座に画面の合計値を使う（ラグを無くすため）
         if (dateStr === currentDate) {
             pData.push(total.p * 4);
             fData.push(total.f * 9);
             cData.push(total.c * 4);
+            wData.push(currentWeight || null);
         } else {
-            // 過去の日はFirebaseから取得
             const docSnap = await getDoc(doc(db, "users", currentUser.uid, "records", dateStr));
-            if (docSnap.exists() && docSnap.data().total) {
-                const t = docSnap.data().total;
-                pData.push((t.p || 0) * 4);
-                fData.push((t.f || 0) * 9);
-                cData.push((t.c || 0) * 4);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const t = data.total || {p:0, f:0, c:0, k:0};
+                pData.push(t.p * 4);
+                fData.push(t.f * 9);
+                cData.push(t.c * 4);
+                wData.push(data.weight || null);
             } else {
-                pData.push(0);
-                fData.push(0);
-                cData.push(0);
+                pData.push(0); fData.push(0); cData.push(0); wData.push(null);
             }
         }
     }
 
     const ctxWeekly = document.getElementById("weeklyChart").getContext("2d");
-
-    // すでにグラフがあれば壊して作り直す
-    if (weeklyChart) {
-        weeklyChart.destroy();
-    }
+    if (weeklyChart) weeklyChart.destroy();
 
     weeklyChart = new Chart(ctxWeekly, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [
-                { label: 'タンパク質', data: pData, backgroundColor: '#FF6384' },
-                { label: '脂質', data: fData, backgroundColor: '#FFCE56' },
-                { label: '炭水化物', data: cData, backgroundColor: '#36A2EB' }
+                {
+                    label: '体重 (kg)',
+                    data: wData,
+                    type: 'line', // これだけ折れ線にする
+                    borderColor: '#9C27B0',
+                    backgroundColor: 'rgba(156, 39, 176, 0.2)',
+                    yAxisID: 'y1', // 右側の目盛りを使用
+                    tension: 0.2,
+                    spanGaps: true,
+                    order: 1 // 棒グラフより手前に表示
+                },
+                { label: 'タンパク質', data: pData, backgroundColor: '#FF6384', yAxisID: 'y', order: 2 },
+                { label: '脂質', data: fData, backgroundColor: '#FFCE56', yAxisID: 'y', order: 2 },
+                { label: '炭水化物', data: cData, backgroundColor: '#36A2EB', yAxisID: 'y', order: 2 }
             ]
         },
         options: {
             responsive: true,
             scales: {
-                x: { stacked: true }, // X軸を積み上げにする
-                y: { stacked: true, beginAtZero: true } // Y軸を積み上げにする
-            },
-            plugins: {
-                datalabels: {
-                    display: false // 円グラフ用のパーセント表示がこちらに混ざらないように非表示
+                x: { stacked: true },
+                y: { 
+                    stacked: true, 
+                    position: 'left', // 左にカロリーの目盛り
+                    title: { display: true, text: 'カロリー (kcal)', font: { size: 10 } }
+                },
+                y1: { 
+                    position: 'right', // 右に体重の目盛り
+                    grid: { drawOnChartArea: false }, // 罫線が被らないようにする
+                    title: { display: true, text: '体重 (kg)', font: { size: 10 } }
                 }
-            }
+            },
+            plugins: { datalabels: { display: false } }
         }
     });
 }
+// 過去2ヶ月（8週間）の週平均カロリーと体重を計算して表示する関数
+async function updateTwoMonthChart() {
+    if (!currentUser) return;
 
+    const weeks = 8;
+    const labels = [];
+    const weeklyCalData = [];
+    const weeklyWeightData = [];
+
+    // データベースへのアクセス回数を減らして高速化するため、Promise.allで56日分を一気に取得
+    const promises = [];
+    for (let i = 0; i < weeks * 7; i++) {
+        const d = new Date();
+        const tzoffset = d.getTimezoneOffset() * 60000;
+        const dateObj = new Date(d - tzoffset - (i * 24 * 60 * 60 * 1000));
+        const dateStr = dateObj.toISOString().split('T')[0];
+
+        if (dateStr === currentDate) {
+             promises.push(Promise.resolve({ date: dateStr, data: { total: total, weight: currentWeight } }));
+        } else {
+             promises.push(
+                 getDoc(doc(db, "users", currentUser.uid, "records", dateStr))
+                 .then(snap => ({ date: dateStr, data: snap.exists() ? snap.data() : null }))
+             );
+        }
+    }
+
+    const results = await Promise.all(promises);
+
+    // 古い週(w=7)から新しい週(w=0)へ向かってループ
+    for (let w = weeks - 1; w >= 0; w--) {
+        let sumCal = 0;
+        let sumWeight = 0;
+        let daysWithCal = 0;
+        let daysWithWeight = 0;
+
+        for (let d = 0; d < 7; d++) {
+            const idx = w * 7 + d;
+            const record = results[idx]?.data;
+
+            if (record) {
+                if (record.total && record.total.k) {
+                    sumCal += record.total.k;
+                    daysWithCal++;
+                }
+                if (record.weight) {
+                    sumWeight += record.weight;
+                    daysWithWeight++;
+                }
+            }
+        }
+
+        // 平均の計算
+        const avgCal = daysWithCal > 0 ? (sumCal / daysWithCal) : 0;
+        const avgWeight = daysWithWeight > 0 ? (sumWeight / daysWithWeight) : null;
+
+        // X軸のラベル作成（例: "3/13週"）
+        const startDateObj = new Date();
+        const tzoffset = startDateObj.getTimezoneOffset() * 60000;
+        const weekStartDate = new Date(startDateObj - tzoffset - ((w * 7 + 6) * 24 * 60 * 60 * 1000));
+        const label = `${weekStartDate.getMonth() + 1}/${weekStartDate.getDate()}週`;
+
+        labels.push(label);
+        weeklyCalData.push(avgCal);
+        weeklyWeightData.push(avgWeight);
+    }
+
+    const ctx = document.getElementById("twoMonthChart").getContext("2d");
+    if (twoMonthChart) twoMonthChart.destroy();
+
+    twoMonthChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '平均体重 (kg)',
+                    data: weeklyWeightData,
+                    type: 'line',
+                    borderColor: '#9C27B0',
+                    backgroundColor: 'rgba(156, 39, 176, 0.2)',
+                    yAxisID: 'y1',
+                    tension: 0.2,
+                    spanGaps: true,
+                    order: 1
+                },
+                {
+                    label: '平均カロリー (kcal)',
+                    data: weeklyCalData,
+                    backgroundColor: '#4CAF50', // 全体の総カロリーなので緑色で統一
+                    yAxisID: 'y',
+                    order: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { stacked: false },
+                y: {
+                    position: 'left',
+                    title: { display: true, text: '平均カロリー', font: { size: 10 } }
+                },
+                y1: {
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    title: { display: true, text: '平均体重', font: { size: 10 } }
+                }
+            },
+            plugins: { datalabels: { display: false } }
+        }
+    });
+}
 // ====== 入力方法切り替え機能 ======
 function switchInputMethod(areaId) {
     // 1. 全ての入力エリアを一旦隠す
@@ -992,3 +1117,13 @@ function addSuggestedDinner(name, p, f, c, k) {
 
 // HTMLからこの関数を呼べるようにする
 window.addSuggestedDinner = addSuggestedDinner;
+
+function saveWeight() {
+    const w = parseFloat(document.getElementById("dailyWeight").value);
+    if (!w) return;
+    currentWeight = w;
+    saveData();
+    updateWeeklyChart(); // (前回作ったupdateWeightChartの代わりに)
+    updateTwoMonthChart(); // ★これも追加
+    alert("体重を記録しました！");
+}
