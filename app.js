@@ -6,6 +6,10 @@ let weeklyChart;
 let twoMonthChart;
 let foods = {};
 let currentWeight = null; // ★ この1行を追加！
+let notifyEnabled = false;
+let notifyTime = "20:00";
+let notifyInterval = null;
+let lastNotifiedDate = null;
 
 function getTodayString() {
     const now = new Date();
@@ -441,14 +445,19 @@ onAuthStateChanged(auth, async (user) => {
         const profileSnap = await getDoc(profileRef);
         
         if (profileSnap.exists()) {
+            const pData = profileSnap.data(); // ★ data()を変数に入れる
             // 【登録済み】保存されている目標値をセットしてアプリ画面へ
-            target = profileSnap.data().target;
+            target = pData.target;
+            notifyEnabled = pData.notifyEnabled || false; // ★ 読み込み
+            notifyTime = pData.notifyTime || "20:00";     // ★ 読み込み
+            
             profileScreen.style.display = "none";
             appScreen.style.display = "block";
             
             document.getElementById("datePicker").value = currentDate;
             loadPresets();
             loadData();
+            startNotificationChecker(); // ★ アプリ起動時にタイマー始動！
         } else {
             // 【未登録】プロフィール設定画面を表示
             appScreen.style.display = "none";
@@ -458,6 +467,7 @@ onAuthStateChanged(auth, async (user) => {
     } else {
         // ========== ログアウト状態のとき ==========
         currentUser = null;
+        if (notifyInterval) clearInterval(notifyInterval);
         appScreen.style.display = "none";
         profileScreen.style.display = "none"; // 追加
         loginScreen.style.display = "block";
@@ -824,6 +834,8 @@ async function saveProfile() {
         c: targetC,
         k: targetKcal
     };
+    notifyEnabled = document.getElementById("profNotifyEnable").checked;
+    notifyTime = document.getElementById("profNotifyTime").value;
 
     try {
         // 5. データベース (Firestore) にプロフィールと目標を保存
@@ -834,7 +846,9 @@ async function saveProfile() {
             weight: weight,
             activity: activity,
             goal: goal,
-            target: target
+            target: target,
+            notifyEnabled: notifyEnabled, // ★ これを追加
+            notifyTime: notifyTime        // ★ これを追加
         });
 
         alert("あなた専用の目標を設定しました！");
@@ -846,6 +860,8 @@ async function saveProfile() {
         document.getElementById("datePicker").value = currentDate;
         loadPresets();
         await loadData(); // これを呼ぶことで updateDisplay() も実行される
+
+        startNotificationChecker();
 
     } catch (error) {
         console.error("プロフィールの保存エラー:", error);
@@ -876,6 +892,12 @@ async function editProfile() {
             // 運動量、目的
             if (data.activity) document.getElementById("profActivity").value = data.activity;
             if (data.goal) document.getElementById("profGoal").value = data.goal;
+
+            if (data.notifyEnabled !== undefined) {
+                document.getElementById("profNotifyEnable").checked = data.notifyEnabled;
+                document.getElementById("profNotifyTime").value = data.notifyTime || "20:00";
+                toggleNotifyTime(); // 表示状態を更新
+            }
         }
     } catch (e) {
         console.error("プロフィール読み込みエラー: ", e);
@@ -1143,3 +1165,56 @@ function saveWeight() {
     updateTwoMonthChart(); // ★これも追加
     alert("体重を記録しました！");
 }
+
+// ====== 通知機能 ======
+
+// チェックボックスを入れたら時間入力欄を出し、スマホに通知の許可を求める
+function toggleNotifyTime() {
+    const isChecked = document.getElementById("profNotifyEnable").checked;
+    document.getElementById("notifyTimeArea").style.display = isChecked ? "block" : "none";
+    
+    if (isChecked && "Notification" in window && Notification.permission !== "granted") {
+        Notification.requestPermission(); // スマホに「通知を許可しますか？」のポップアップを出す
+    }
+}
+
+// 1分ごとに時間を監視して、条件に合えば通知を出す関数
+function startNotificationChecker() {
+    if (notifyInterval) clearInterval(notifyInterval);
+    if (!notifyEnabled) return;
+
+    notifyInterval = setInterval(() => {
+        if (!notifyEnabled || !notifyTime) return;
+
+        const now = new Date();
+        const currentH = String(now.getHours()).padStart(2, '0');
+        const currentM = String(now.getMinutes()).padStart(2, '0');
+        const currentTimeStr = `${currentH}:${currentM}`;
+
+        // 設定した時間になったら実行
+        if (currentTimeStr === notifyTime) {
+            if (lastNotifiedDate === currentDate) return; // 今日すでに通知済みなら何もしない
+
+            let message = "";
+            if (history.length === 0) {
+                message = "今日の食事がまだ記録されていません！忘れずに追加しましょう。";
+            } else if (total.k < target.k * 0.5) {
+                message = "今日のカロリーが目標の半分未満です。記録忘れはありませんか？";
+            }
+
+            if (message !== "") {
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("FitNavi リマインダー", {
+                        body: message,
+                        icon: "icon-192.png" // スマホのプッシュ通知
+                    });
+                } else {
+                    alert("🔔 【FitNavi リマインダー】\n\n" + message); // 通知が許可されてない場合はアラート
+                }
+                lastNotifiedDate = currentDate; // 通知済みフラグを立てて連呼を防ぐ
+            }
+        }
+    }, 60000); // 60000ミリ秒 ＝ 1分ごとに時間をチェック
+}
+
+window.toggleNotifyTime = toggleNotifyTime;

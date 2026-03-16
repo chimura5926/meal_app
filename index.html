@@ -68,6 +68,18 @@
                 </select>
             </div>
 
+            <div style="margin-bottom: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                <label style="font-weight: bold;">🔔 記録忘れ防止通知：</label><br>
+                <label style="font-size: 14px; display: block; margin-top: 5px; cursor: pointer;">
+                    <input type="checkbox" id="profNotifyEnable" onchange="toggleNotifyTime()"> 通知をオンにする
+                </label>
+                <div id="notifyTimeArea" style="display: none; margin-top: 8px;">
+                    <label style="font-size: 14px;">通知時間：</label>
+                    <input type="time" id="profNotifyTime" value="20:00" style="padding: 5px; font-size: 16px; width: 100px;">
+                    <p style="font-size: 11px; color: #999; margin: 5px 0 0 0;">※指定時間に「記録0」または「カロリーが目標の半分未満」の場合にお知らせします。</p>
+                </div>
+            </div>
+
         </div>
         
         <button onclick="saveProfile()" style="background-color: #4CAF50; color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 25px; cursor: pointer;">

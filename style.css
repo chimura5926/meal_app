@@ -3,6 +3,8 @@ font-family:sans-serif;
 text-align:center;
 margin:20px;           /* 少し余白を減らして横幅を広く使う */
 font-size:16px;        /* 🌟全体の文字を少し大きく */
+padding-bottom: 80px;  /* ★追加：一番下に「ゆとり」を作ってグラフの震えを防ぐ */
+overflow-x: hidden;    /* ★追加：見えない横揺れを完全に防ぐ */
 }
 
 h1 {
