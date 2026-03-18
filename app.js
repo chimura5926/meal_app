@@ -88,19 +88,22 @@ function updateDisplay(){
     document.getElementById("targetP").innerText = target.p.toFixed(1);
     document.getElementById("targetF").innerText = target.f.toFixed(1);
     document.getElementById("targetC").innerText = target.c.toFixed(1);
-    document.getElementById("targetK").innerText = target.k.toFixed(0);
+    // 修正: toFixed(0) -> toFixed(1)
+    document.getElementById("targetK").innerText = target.k.toFixed(1);
 
     document.getElementById("p").innerText = total.p.toFixed(1);
     document.getElementById("f").innerText = total.f.toFixed(1);
     document.getElementById("c").innerText = total.c.toFixed(1);
-    document.getElementById("kcal").innerText = total.k.toFixed(0);
+    // 修正: toFixed(0) -> toFixed(1)
+    document.getElementById("kcal").innerText = total.k.toFixed(1);
 
     document.getElementById("remainP").innerText = (target.p-total.p).toFixed(1);
     document.getElementById("remainF").innerText = (target.f-total.f).toFixed(1);
     document.getElementById("remainC").innerText = (target.c-total.c).toFixed(1);
-    document.getElementById("remainK").innerText = (target.k-total.k).toFixed(0);
+    // 修正: toFixed(0) -> toFixed(1)
+    document.getElementById("remainK").innerText = (target.k-total.k).toFixed(1);
 
-    // ★ 水分の表示更新
+    // ★ 水分の表示更新 (そのまま)
     document.getElementById("targetWater").innerText = target.water ? target.water.toFixed(0) : 0;
     document.getElementById("currentWater").innerText = total.water ? total.water.toFixed(0) : 0;
     
@@ -173,14 +176,14 @@ function updateHistory(){
 
         row.innerHTML =
             '<td class="food-name" onclick="showFoodNamePopup(\'' + displayName.replace(/'/g, "\\'") + '\')" style="color: #333; cursor: pointer;">' + displayName + "</td>" +
-            "<td>" + food.p + "</td>" +
-            "<td>" + food.f + "</td>" +
-            "<td>" + food.c + "</td>" +
-            "<td>" + food.k.toFixed(0) + "</td>" +
+            // 修正: 各値に .toFixed(1) を適用（エラー防止のためにparseFloatを使用）
+            "<td>" + parseFloat(food.p).toFixed(1) + "</td>" +
+            "<td>" + parseFloat(food.f).toFixed(1) + "</td>" +
+            "<td>" + parseFloat(food.c).toFixed(1) + "</td>" +
+            "<td>" + parseFloat(food.k).toFixed(1) + "</td>" +
             presetBtnHtml +
             '<td><button onclick="removeFood(' + index + ')" style="background-color:#2196F3; color:white; border:none; border-radius:3px; cursor:pointer;">✓</button></td>';        
-        tbody.appendChild(row);
-    });
+        tbody.appendChild(row);    });
 }
 
 function removeFood(index){
@@ -1011,19 +1014,19 @@ function renderSuggestionsModal() {
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; background: white; padding: 6px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 8px;">
                 <div style="border-right: 1px solid #eee;">
                     <div style="font-size: 10px; color: #999;">P</div>
-                    <div style="font-size: 13px; font-weight: bold; color: #FF6384;">${menu.p}g</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #FF6384;">${parseFloat(menu.p).toFixed(1)}g</div>
                 </div>
                 <div style="border-right: 1px solid #eee;">
                     <div style="font-size: 10px; color: #999;">F</div>
-                    <div style="font-size: 13px; font-weight: bold; color: #FFCE56;">${menu.f}g</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #FFCE56;">${parseFloat(menu.f).toFixed(1)}g</div>
                 </div>
                 <div style="border-right: 1px solid #eee;">
                     <div style="font-size: 10px; color: #999;">C</div>
-                    <div style="font-size: 13px; font-weight: bold; color: #36A2EB;">${menu.c}g</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #36A2EB;">${parseFloat(menu.c).toFixed(1)}g</div>
                 </div>
                 <div>
                     <div style="font-size: 10px; color: #999;">kcal</div>
-                    <div style="font-size: 13px; font-weight: bold; color: #555;">${menu.k}</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #555;">${parseFloat(menu.k).toFixed(1)}</div>
                 </div>
             </div>
 
