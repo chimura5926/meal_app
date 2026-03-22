@@ -1162,3 +1162,181 @@ function addCustomWater() {
     input.value = "";
 }
 window.addCustomWater = addCustomWater;
+
+let currentGeneratedWorkout = null; // 生成されたメニューを一時保存する変数
+
+function openWorkoutInputModal() {
+    document.getElementById("workoutInputModal").style.display = "flex";
+}
+window.openWorkoutInputModal = openWorkoutInputModal;
+
+function closeWorkoutInputModal() {
+    document.getElementById("workoutInputModal").style.display = "none";
+}
+window.closeWorkoutInputModal = closeWorkoutInputModal;
+
+function closeWorkoutResultModal() {
+    document.getElementById("workoutResultModal").style.display = "none";
+}
+window.closeWorkoutResultModal = closeWorkoutResultModal;
+
+// 1. 前日の食事データを取得する関数
+async function getYesterdayNutrition() {
+    if (!currentUser) return null;
+    const d = new Date();
+    const tzoffset = d.getTimezoneOffset() * 60000;
+    const yesterdayObj = new Date(d - tzoffset - (24 * 60 * 60 * 1000));
+    const yesterdayStr = yesterdayObj.toISOString().split('T')[0];
+
+    const docSnap = await getDoc(doc(db, "users", currentUser.uid, "records", yesterdayStr));
+    if (docSnap.exists()) {
+        return docSnap.data().total;
+    }
+    return null;
+}
+
+// 2. 過去のトレーニング履歴を直近数件取得する関数
+async function getRecentWorkouts() {
+    if (!currentUser) return [];
+    const q = query(collection(db, "users", currentUser.uid, "workouts"), orderBy("date", "desc"), limit(5));
+    const querySnapshot = await getDocs(q);
+    let workouts = [];
+    querySnapshot.forEach((docSnap) => {
+        workouts.push(docSnap.data());
+    });
+    return workouts;
+}
+
+// 3. トレーニング生成のメイン処理
+async function generateWorkout() {
+    const btn = document.getElementById("woGenerateBtn");
+    const statusText = document.getElementById("woStatusText");
+    
+    btn.disabled = true;
+    btn.style.backgroundColor = "#ccc";
+    statusText.style.display = "block";
+
+    // UIから入力値を取得
+    const env = document.getElementById("woEnv").value;
+    const cond = document.getElementById("woCond").value;
+    const isTimeAuto = document.getElementById("woTimeAuto").checked;
+    const time = isTimeAuto ? "おまかせ" : document.getElementById("woTimeSlider").value + "分";
+    const targetMuscle = document.getElementById("woTarget").value;
+
+    // 前日の食事と過去の履歴を取得
+    const yesterdayFood = await getYesterdayNutrition();
+    const recentWorkouts = await getRecentWorkouts();
+
+    // =============== AIに送るためのプロンプト情報 ===============
+    // ※ 実際のバックエンド（/api/workout等）がある場合は、このpromptを送信します。
+    // 今回はAI API（OpenAI等）に渡す想定のプロンプト文字列を構築します。
+    
+    const promptData = {
+        role: "あなたは中級者向けの論理的でドライなパーソナルトレーナーです。感情的な励ましは不要で、数字と根拠ベースで指示を出してください。",
+        user_context: {
+            environment: env,
+            condition: cond,
+            available_time: time,
+            target_muscle: targetMuscle,
+            yesterday_nutrition: yesterdayFood ? `P:${yesterdayFood.p}g, F:${yesterdayFood.f}g, C:${yesterdayFood.c}g` : "データなし",
+            recent_workouts: recentWorkouts.map(w => `${w.date}: ${w.target} (${w.completionLevel})`)
+        },
+        output_format: "必ず以下のJSON形式のみで出力してください。Markdownの```jsonなどは含めないでください。",
+        json_schema: {
+            "aiComment": "なぜこのメニューにしたのか、前日の食事や過去の履歴を交えたドライで論理的な理由（100文字程度）",
+            "exercises": [
+                { "name": "種目名", "sets": 3, "reps": 10, "interval": 60 }
+            ]
+        }
+    };
+
+    try {
+        /*
+        ====================================================================
+        【重要】ここにバックエンドのAI API（Gemini/ChatGPT等）を叩く処理を書きます。
+        既存の /api/estimate と同じように独自エンドポイントを作成してください。
+        
+        const response = await fetch('/api/generateWorkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: promptData })
+        });
+        const aiResult = await response.json();
+        ====================================================================
+        */
+
+        // ⚠️ 以下はAPIが繋がるまでのモック（仮）データです。繋いだら削除してください。
+        await new Promise(resolve => setTimeout(resolve, 1500)); // 通信のフリ
+        const aiResult = {
+            aiComment: `昨日の脂質摂取量がやや多いため、消費カロリーを稼ぐべくインターバルを短く設定しました。前回は胸を攻めているため、本日は${targetMuscle === 'おまかせ' ? '背中' : targetMuscle}を中心に${time === 'おまかせ' ? '45分' : time}で完了する構成です。`,
+            exercises: [
+                { name: env === "自重" ? "懸垂" : "ラットプルダウン", sets: 3, reps: 10, interval: 60 },
+                { name: env === "自重" ? "リバーススノーエンジェル" : "シーテッドロー", sets: 3, reps: 12, interval: 60 },
+                { name: "プランク", sets: 3, reps: "60秒", interval: 30 }
+            ]
+        };
+        // ⚠️ モックここまで
+
+        currentGeneratedWorkout = {
+            date: currentDate,
+            environment: env,
+            condition: cond,
+            time: time,
+            target: targetMuscle,
+            ...aiResult
+        };
+
+        renderWorkoutResult(aiResult);
+
+        closeWorkoutInputModal();
+        document.getElementById("workoutResultModal").style.display = "flex";
+
+    } catch (e) {
+        console.error(e);
+        alert("メニューの生成に失敗しました。");
+    } finally {
+        btn.disabled = false;
+        btn.style.backgroundColor = "#F44336";
+        statusText.style.display = "none";
+    }
+}
+window.generateWorkout = generateWorkout;
+function renderWorkoutResult(data) {
+    document.getElementById("woAiComment").innerText = data.aiComment;
+    
+    const listDiv = document.getElementById("woExerciseList");
+    listDiv.innerHTML = "";
+
+    data.exercises.forEach((ex, index) => {
+        const card = document.createElement("div");
+        card.style.cssText = "border: 1px solid #ddd; border-radius: 6px; padding: 10px; background: #fafafa;";
+        card.innerHTML = `
+            <div style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">${index + 1}. ${ex.name}</div>
+            <div style="display: flex; gap: 15px; font-size: 13px; color: #555;">
+                <span>🎯 ${ex.sets} セット</span>
+                <span>🔄 ${ex.reps} ${typeof ex.reps === 'number' ? '回' : ''}</span>
+                <span>⏱️ 休憩: ${ex.interval}秒</span>
+            </div>
+        `;
+        listDiv.appendChild(card);
+    });
+}
+async function saveWorkout() {
+    if (!currentUser || !currentGeneratedWorkout) return;
+
+    const completion = document.getElementById("woCompletion").value;
+    currentGeneratedWorkout.completionLevel = completion;
+    currentGeneratedWorkout.timestamp = new Date().getTime(); // ソート用
+
+    try {
+        // users/{uid}/workouts/{date} に保存
+        await setDoc(doc(db, "users", currentUser.uid, "workouts", currentDate), currentGeneratedWorkout);
+        
+        alert("今日のトレーニング履歴を保存しました！お疲れ様でした！");
+        closeWorkoutResultModal();
+    } catch (e) {
+        console.error("保存エラー: ", e);
+        alert("保存に失敗しました。");
+    }
+}
+window.saveWorkout = saveWorkout;

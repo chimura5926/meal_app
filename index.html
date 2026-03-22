@@ -156,7 +156,9 @@
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 20px;">
             <input type="date" id="datePicker" onchange="changeDate()" style="font-size: 16px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 60%;">
-            
+            <button onclick="openWorkoutInputModal()" style="background: linear-gradient(135deg, #FF9800, #F44336); color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.15); width: 80%; cursor: pointer;">
+                今日のトレ生成
+            </button>
         </div>
 
         <div class="input-tabs" style="display: flex; justify-content: center; gap: 8px; margin-top: 15px; margin-bottom: 10px; width: 100%;">
@@ -383,6 +385,85 @@
             <div id="suggestListModal">
                 <p style="text-align: center; color: #999; padding: 20px 0;">計算中...</p>
             </div>
+        </div>
+    </div>
+    <div id="workoutInputModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: left;">
+            <button onclick="closeWorkoutInputModal()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 22px; color: #999; cursor: pointer;">✖</button>
+            <h3 style="margin-top: 0; color: #F44336;">⚙️ 条件を入力</h3>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; font-size: 14px;">🏋️ 環境</label><br>
+                <select id="woEnv" style="width: 100%; padding: 8px; margin-top: 5px;">
+                    <option value="ジム">ジム（マシン・フリーウェイトあり）</option>
+                    <option value="自重">自重（器具なし・自宅）</option>
+                    <option value="ダンベルのみ">自宅（ダンベルのみ）</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; font-size: 14px;">🔋 コンディション</label><br>
+                <select id="woCond" style="width: 100%; padding: 8px; margin-top: 5px;">
+                    <option value="良好">良好</option>
+                    <option value="普通" selected>普通</option>
+                    <option value="疲労気味">疲労気味（軽めでやりたい）</option>
+                    <option value="筋肉痛あり">筋肉痛あり</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; font-size: 14px;">⏱️ 時間</label><br>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                    <input type="range" id="woTimeSlider" min="10" max="120" step="5" value="45" oninput="document.getElementById('woTimeVal').innerText = this.value + '分'" style="flex-grow: 1;">
+                    <span id="woTimeVal" style="font-weight: bold; width: 45px; text-align: right;">45分</span>
+                </div>
+                <label style="font-size: 13px; display: block; margin-top: 5px;">
+                    <input type="checkbox" id="woTimeAuto" onchange="document.getElementById('woTimeSlider').disabled = this.checked;"> AIにおまかせ
+                </label>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: bold; font-size: 14px;">🎯 鍛えたい部位</label><br>
+                <select id="woTarget" style="width: 100%; padding: 8px; margin-top: 5px;">
+                    <option value="おまかせ" selected>AIにおまかせ</option>
+                    <option value="胸">胸</option>
+                    <option value="背中">背中</option>
+                    <option value="脚">脚</option>
+                    <option value="肩・腕">肩・腕</option>
+                    <option value="腹筋">腹筋</option>
+                </select>
+            </div>
+            <button onclick="generateWorkout()" id="woGenerateBtn" style="width: 100%; background-color: #F44336; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer;">
+                メニューを生成する
+            </button>
+            <p id="woStatusText" style="font-size: 12px; color: #666; text-align: center; margin-top: 10px; display: none;">AIが過去の記録と前日の食事から計算中...</p>
+        </div>
+    </div>
+    <div id="workoutResultModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: left;">
+            <button onclick="closeWorkoutResultModal()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 22px; color: #999; cursor: pointer;">✖</button>
+            <h3 style="margin-top: 0; color: #4CAF50;">📋 今日の最適メニュー</h3>
+            
+            <div id="woAiComment" style="background: #f1f8e9; padding: 10px; border-radius: 8px; font-size: 13px; color: #33691e; margin-bottom: 15px; line-height: 1.4;">
+                </div>
+
+            <div id="woExerciseList" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+                </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; font-size: 14px;">✅ 達成度を記録して終了</label><br>
+                <select id="woCompletion" style="width: 100%; padding: 10px; margin-top: 5px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px;">
+                    <option value="やり切った">😎 やり切った（完璧）</option>
+                    <option value="あと少し">🙂 あと少し（9割完了）</option>
+                    <option value="途中で限界">🥵 途中で限界（半分くらい）</option>
+                    <option value="ほんの少し">🤏 ほんの少し（少しだけやった）</option>
+                    <option value="全くできなかった">🙅‍♂️ 全くできなかった</option>
+                </select>
+            </div>
+
+            <button onclick="saveWorkout()" style="width: 100%; background-color: #4CAF50; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer;">
+                履歴に保存して完了
+            </button>
         </div>
     </div>
     </body>
