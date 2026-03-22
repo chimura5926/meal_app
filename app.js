@@ -217,17 +217,12 @@ function removeFood(index){
 async function addAiFood() {
     let text = document.getElementById("aiText").value;
     const imageFile = document.getElementById("aiImage").files[0];
-    const aiAmount = document.getElementById("aiAmount").value;
     const status = document.getElementById("aiStatus");
     const btn = document.getElementById("aiBtn");
 
     if (!text && !imageFile) {
         alert("料理名を入力するか、画像を添付してください");
         return;
-    }
-
-    if (aiAmount) {
-        text = text ? `${text} (※分量・食べた割合: ${aiAmount})` : `(※添付画像の分量・食べた割合: ${aiAmount})`;
     }
 
     status.innerText = "解析中...";

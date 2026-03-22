@@ -146,15 +146,17 @@
                         <span>プロフィール設定</span>
                         <span style="color: #999;">＞</span>
                     </button>
+
+                    <button onclick="logout(); toggleMenuDrawer();" style="background-color: #fff0f0; color: #d32f2f; border: 1px solid #ffcdd2; padding: 15px; border-radius: 8px; text-align: left; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <span>ログアウト</span>
+                        <span style="color: #d32f2f;">＞</span>
+                    </button>
                 </div>
             </div>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 20px;">
             <input type="date" id="datePicker" onchange="changeDate()" style="font-size: 16px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 60%;">
             
-            <div style="display: flex; gap: 15px; margin-top: 5px;">
-                <button id="logoutBtn" onclick="logout()" style="padding: 10px 18px;">ログアウト</button>
-            </div>
         </div>
 
         <div class="input-tabs" style="display: flex; justify-content: center; gap: 8px; margin-top: 15px; margin-bottom: 10px; width: 100%;">
@@ -220,17 +222,13 @@
             </p>
 
             <input type="text" id="aiText"
-                placeholder="(例) 天ぷら定食"
+                placeholder="(例) 天ぷら定食　１人前"
                 style="width:90%; padding:12px; margin-bottom:15px; font-size:16px;">
 
             <br>
 
             <div style="text-align:center;margin-bottom:15px;">
             <input type="file" id="aiImage" accept="image/*" style="padding: 5px;">
-            </div>
-
-            <div style="text-align:center; margin-bottom:15px;">
-                <input type="text" id="aiAmount" placeholder="食べた量 (例: 写真の半分, 2人前)" style="width:90%; padding:12px; font-size:16px;">
             </div>
 
             <div style="text-align:center;">
