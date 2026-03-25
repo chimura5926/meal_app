@@ -113,10 +113,15 @@ function updateDisplay(){
 }
 
 function formatNum(value, isKcal) {
-    // isKcalが true ならカロリー(整数)、false ならPFC(小数第1位)にする
-    let str = value.toFixed(isKcal ? 0 : 1);
+    let str;
+    if (isKcal) {
+        str = Math.round(value).toString();
+    } else {
+        // 小数第1位まで計算したあと、.0なら自動で消す処理
+        str = parseFloat(value.toFixed(1)).toString();
+    }
     
-    // 文字数が4文字以上（例: "2200", "120.5", "-150" など）の場合
+    // 文字数が4文字以上の場合
     if (str.length >= 4) {
         return `<span style="font-size: 11px; white-space: nowrap;">${str}</span>`;
     }
@@ -191,7 +196,9 @@ function updateHistory(){
             "<td>" + formatNum(parseFloat(food.c), false) + "</td>" +
             "<td>" + formatNum(parseFloat(food.k), true) + "</td>" +
             presetBtnHtml +
-            '<td><button onclick="removeFood(' + index + ')" style="background-color:#F44336; color:white; border:none; border-radius:3px; cursor:pointer; font-size: 14px; padding: 4px 6px;">🗑️</button></td>';        
+            '<td><button onclick="removeFood(' + index + ')" style="background-color: white; color: #F44336; border: 1px solid #F44336; border-radius: 3px; cursor: pointer; padding: 2px 4px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">' +
+            '<span class="material-symbols-outlined" style="font-size: 16px;">delete</span>' +
+            '</button></td>';        
         tbody.appendChild(row);    });
 }
 
@@ -1064,15 +1071,15 @@ function renderSuggestionsModal() {
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; background: white; padding: 6px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 8px;">
                 <div style="border-right: 1px solid #eee;">
                     <div style="font-size: 10px; color: #999;">P</div>
-                    <div style="font-size: 13px; font-weight: bold; color: #FF6384;">${parseFloat(menu.p).toFixed(1)}g</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #FF6384;">${parseFloat(menu.p.toFixed(1))}g</div>
                 </div>
                 <div style="border-right: 1px solid #eee;">
                     <div style="font-size: 10px; color: #999;">F</div>
-                    <div style="font-size: 13px; font-weight: bold; color: #FFCE56;">${parseFloat(menu.f).toFixed(1)}g</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #FFCE56;">${parseFloat(menu.f.toFixed(1))}g</div>
                 </div>
                 <div style="border-right: 1px solid #eee;">
                     <div style="font-size: 10px; color: #999;">C</div>
-                    <div style="font-size: 13px; font-weight: bold; color: #36A2EB;">${parseFloat(menu.c).toFixed(1)}g</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #36A2EB;">${parseFloat(menu.c.toFixed(1))}g</div>
                 </div>
                 <div>
                     <div style="font-size: 10px; color: #999;">kcal</div>
