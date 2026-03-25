@@ -112,20 +112,23 @@ function updateDisplay(){
     if (waterBar) waterBar.style.width = waterPercent + "%";
 }
 
-function formatNum(value, isKcal) {
+function formatNum(value, isKcal, isHistory = false) {
     let str;
     if (isKcal) {
         str = Math.round(value).toString();
     } else {
-        // 小数第1位まで計算したあと、.0なら自動で消す処理
         str = parseFloat(value.toFixed(1)).toString();
     }
     
-    // 文字数が4文字以上の場合
-    if (str.length >= 4) {
-        return `<span style="font-size: 11px; white-space: nowrap;">${str}</span>`;
+    // 食事履歴の時だけ、小数点(.)を除外した数字の個数が4桁以上なら小さくする
+    if (isHistory) {
+        let digitCount = str.replace('.', '').length;
+        if (digitCount >= 4) {
+            return `<span style="font-size: 11px; white-space: nowrap;">${str}</span>`;
+        }
     }
-    // 3文字以下なら通常のサイズのまま改行だけ防ぐ
+    
+    // 今日の合計、または履歴でも4桁未満の場合は通常のサイズ
     return `<span style="white-space: nowrap;">${str}</span>`;
 }
 
@@ -191,10 +194,10 @@ function updateHistory(){
         row.innerHTML =
             '<td class="food-name" onclick="showFoodNamePopup(\'' + displayName.replace(/'/g, "\\'") + '\')" style="color: #333; cursor: pointer;">' + displayName + "</td>" +
             // 修正: 各値に .toFixed(1) を適用（エラー防止のためにparseFloatを使用）
-            "<td>" + formatNum(parseFloat(food.p), false) + "</td>" +
-            "<td>" + formatNum(parseFloat(food.f), false) + "</td>" +
-            "<td>" + formatNum(parseFloat(food.c), false) + "</td>" +
-            "<td>" + formatNum(parseFloat(food.k), true) + "</td>" +
+            "<td>" + formatNum(parseFloat(food.p), false, true) + "</td>" +
+            "<td>" + formatNum(parseFloat(food.f), false, true) + "</td>" +
+            "<td>" + formatNum(parseFloat(food.c), false, true) + "</td>" +
+            "<td>" + formatNum(parseFloat(food.k), true, true) + "</td>" +
             presetBtnHtml +
             '<td><button onclick="removeFood(' + index + ')" style="background-color: white; color: #F44336; border: 1px solid #F44336; border-radius: 3px; cursor: pointer; padding: 2px 4px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">' +
             '<span class="material-symbols-outlined" style="font-size: 16px;">delete</span>' +
@@ -773,7 +776,7 @@ async function removePreset() {
     }
 
     // 間違えて押した時のために確認メッセージを出す
-    if (!confirm(`「${selectedName}」を定番リストから完全に削除しますか？`)) {
+    if (!confirm(`「${selectedName}」を定番リストから削除しますか？`)) {
         return;
     }
 
