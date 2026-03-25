@@ -799,7 +799,7 @@ async function removePreset() {
             querySnapshot.forEach(async (documentSnapshot) => {
                 await deleteDoc(doc(db, "users", currentUser.uid, "presets", documentSnapshot.id));
             });
-            alert("削除しました！");
+            // 通知をなくすために削除しました
         } catch (e) {
             console.error("定番の削除エラー: ", e);
             alert("削除中にエラーが発生しました。");
