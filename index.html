@@ -173,9 +173,12 @@
             <p style="font-size:12px;color:#666;margin-top:0;margin-bottom:12px;line-height:1.4;">
             ※新しい定番メニューは、下部の「食事履歴」にある「✓」ボタンを押して追加してください。
             </p>
-            <select id="food" style="width:90%; padding:12px; margin-bottom:15px;">
-                <option value="" disabled selected>登録されている定番がありません</option>
-            </select>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <select id="food" style="width: 75%; padding: 12px; margin-bottom: 0;">
+                    <option value="" disabled selected>登録されている定番がありません</option>
+                </select>
+                <button onclick="removePreset()" style="background-color: #F44336; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; padding: 10px 14px;" title="選択した定番を削除">🗑️</button>
+            </div>
             <div style="margin-bottom: 15px; font-size: 14px;">
                 分量: <input type="number" id="presetAmount" value="1" step="0.1" min="0.1" style="width: 70px; padding: 8px; font-size: 16px;"> 人前
             </div>

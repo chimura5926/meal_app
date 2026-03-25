@@ -1,5 +1,5 @@
 import { db, auth } from "./firebase.js";
-import { doc, setDoc, getDoc, collection, query, limit, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { doc, setDoc, getDoc, collection, query, limit, getDocs, orderBy, deleteDoc, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 let currentUser = null;
 let weeklyChart;
@@ -85,23 +85,20 @@ function addFood(){
 }
 
 function updateDisplay(){
-    document.getElementById("targetP").innerText = target.p.toFixed(1);
-    document.getElementById("targetF").innerText = target.f.toFixed(1);
-    document.getElementById("targetC").innerText = target.c.toFixed(1);
-    // 修正: toFixed(0) -> toFixed(1)
-    document.getElementById("targetK").innerText = target.k.toFixed(1);
+    document.getElementById("targetP").innerHTML = formatNum(target.p, false);
+    document.getElementById("targetF").innerHTML = formatNum(target.f, false);
+    document.getElementById("targetC").innerHTML = formatNum(target.c, false);
+    document.getElementById("targetK").innerHTML = formatNum(target.k, true);
 
-    document.getElementById("p").innerText = total.p.toFixed(1);
-    document.getElementById("f").innerText = total.f.toFixed(1);
-    document.getElementById("c").innerText = total.c.toFixed(1);
-    // 修正: toFixed(0) -> toFixed(1)
-    document.getElementById("kcal").innerText = total.k.toFixed(1);
+    document.getElementById("p").innerHTML = formatNum(total.p, false);
+    document.getElementById("f").innerHTML = formatNum(total.f, false);
+    document.getElementById("c").innerHTML = formatNum(total.c, false);
+    document.getElementById("kcal").innerHTML = formatNum(total.k, true);
 
-    document.getElementById("remainP").innerText = (target.p-total.p).toFixed(1);
-    document.getElementById("remainF").innerText = (target.f-total.f).toFixed(1);
-    document.getElementById("remainC").innerText = (target.c-total.c).toFixed(1);
-    // 修正: toFixed(0) -> toFixed(1)
-    document.getElementById("remainK").innerText = (target.k-total.k).toFixed(1);
+    document.getElementById("remainP").innerHTML = formatNum(target.p-total.p, false);
+    document.getElementById("remainF").innerHTML = formatNum(target.f-total.f, false);
+    document.getElementById("remainC").innerHTML = formatNum(target.c-total.c, false);
+    document.getElementById("remainK").innerHTML = formatNum(target.k-total.k, true);
 
     // ★ 水分の表示更新 (そのまま)
     document.getElementById("targetWater").innerText = target.water ? target.water.toFixed(0) : 0;
@@ -113,6 +110,18 @@ function updateDisplay(){
     }
     const waterBar = document.getElementById("waterProgressBar");
     if (waterBar) waterBar.style.width = waterPercent + "%";
+}
+
+function formatNum(value, isKcal) {
+    // isKcalが true ならカロリー(整数)、false ならPFC(小数第1位)にする
+    let str = value.toFixed(isKcal ? 0 : 1);
+    
+    // 文字数が4文字以上（例: "2200", "120.5", "-150" など）の場合
+    if (str.length >= 4) {
+        return `<span style="font-size: 11px; white-space: nowrap;">${str}</span>`;
+    }
+    // 3文字以下なら通常のサイズのまま改行だけ防ぐ
+    return `<span style="white-space: nowrap;">${str}</span>`;
 }
 
 function updateChart(){
@@ -177,12 +186,12 @@ function updateHistory(){
         row.innerHTML =
             '<td class="food-name" onclick="showFoodNamePopup(\'' + displayName.replace(/'/g, "\\'") + '\')" style="color: #333; cursor: pointer;">' + displayName + "</td>" +
             // 修正: 各値に .toFixed(1) を適用（エラー防止のためにparseFloatを使用）
-            "<td>" + parseFloat(food.p).toFixed(1) + "</td>" +
-            "<td>" + parseFloat(food.f).toFixed(1) + "</td>" +
-            "<td>" + parseFloat(food.c).toFixed(1) + "</td>" +
-            "<td>" + parseFloat(food.k).toFixed(1) + "</td>" +
+            "<td>" + formatNum(parseFloat(food.p), false) + "</td>" +
+            "<td>" + formatNum(parseFloat(food.f), false) + "</td>" +
+            "<td>" + formatNum(parseFloat(food.c), false) + "</td>" +
+            "<td>" + formatNum(parseFloat(food.k), true) + "</td>" +
             presetBtnHtml +
-            '<td><button onclick="removeFood(' + index + ')" style="background-color:#2196F3; color:white; border:none; border-radius:3px; cursor:pointer;">✓</button></td>';        
+            '<td><button onclick="removeFood(' + index + ')" style="background-color:#F44336; color:white; border:none; border-radius:3px; cursor:pointer; font-size: 14px; padding: 4px 6px;">🗑️</button></td>';        
         tbody.appendChild(row);    });
 }
 
@@ -746,6 +755,51 @@ async function loadPresets() {
     }
 }
 
+// ▼▼ 定番メニューを削除する処理 ▼▼
+async function removePreset() {
+    const select = document.getElementById("food");
+    const selectedName = select.value;
+
+    if (!selectedName) {
+        alert("削除する定番メニューを選択してください。");
+        return;
+    }
+
+    // 間違えて押した時のために確認メッセージを出す
+    if (!confirm(`「${selectedName}」を定番リストから完全に削除しますか？`)) {
+        return;
+    }
+
+    // 1. 画面のリストとメモリから消す
+    delete foods[selectedName];
+    select.remove(select.selectedIndex);
+
+    // すべて消えた場合の表示リセット
+    if (select.options.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.text = "登録されている定番がありません";
+        option.disabled = true;
+        option.selected = true;
+        select.appendChild(option);
+    }
+
+    // 2. データベース(Firestore)から消す
+    if (currentUser) {
+        try {
+            const q = query(collection(db, "users", currentUser.uid, "presets"), where("name", "==", selectedName));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (documentSnapshot) => {
+                await deleteDoc(doc(db, "users", currentUser.uid, "presets", documentSnapshot.id));
+            });
+            alert("削除しました！");
+        } catch (e) {
+            console.error("定番の削除エラー: ", e);
+            alert("削除中にエラーが発生しました。");
+        }
+    }
+}
+
 async function saveProfile() {
     if (!currentUser) return;
 
@@ -871,6 +925,7 @@ window.addPresetFromHistory = addPresetFromHistory;
 window.saveProfile = saveProfile;
 window.editProfile = editProfile;
 window.saveWeight = saveWeight;
+window.removePreset = removePreset;
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standabunnryoulone;
@@ -1021,7 +1076,7 @@ function renderSuggestionsModal() {
                 </div>
                 <div>
                     <div style="font-size: 10px; color: #999;">kcal</div>
-                    <div style="font-size: 13px; font-weight: bold; color: #555;">${parseFloat(menu.k).toFixed(1)}</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #555;">${parseFloat(menu.k).toFixed(0)}</div>
                 </div>
             </div>
 
