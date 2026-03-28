@@ -18,7 +18,8 @@ function getTodayString() {
     return new Date(now - tzoffset).toISOString().split('T')[0];
 }
 let currentDate = getTodayString();
-
+let apiUsageCount = 0;
+const MAX_API_CALLS = 20; // 1日の上限回数
 let target = { p:0, f:0, c:0, k:0, water: 0 };
 let total = { p:0, f:0, c:0, k:0, water: 0 };
 
@@ -234,71 +235,87 @@ function removeFood(index){
 }
 
 async function addAiFood() {
-    let text = document.getElementById("aiText").value;
-    const imageFile = document.getElementById("aiImage").files[0];
-    const status = document.getElementById("aiStatus");
-    const btn = document.getElementById("aiBtn");
-
-    if (!text && !imageFile) {
-        alert("料理名を入力するか、画像を添付してください");
+    // 1. 最初に上限チェック
+    if (apiUsageCount >= MAX_API_CALLS) {
+        alert(`本日のAI利用上限（${MAX_API_CALLS}回）に達しました。また明日ご利用ください！`);
         return;
     }
 
-    status.innerText = "解析中...";
-    btn.disabled = true;
+    const text = document.getElementById("aiText").value;
+    const imageFile = document.getElementById("aiImage").files[0];
+    const btn = document.getElementById("aiBtn");
+    const status = document.getElementById("aiStatus");
 
-    let base64Image = null;
-    if (imageFile) {
-        base64Image = await toBase64(imageFile);
+    if (!text && !imageFile) {
+        alert("テキストを入力するか、写真を選択してください。");
+        return;
     }
 
+    // 処理中はボタンを押せないようにし、テキストを変更
+    btn.disabled = true;
+    status.innerText = "AIが解析中です...";
+
     try {
+        // 写真がある場合はBase64形式に変換
+        let imageBase64 = null;
+        if (imageFile) {
+            imageBase64 = await toBase64(imageFile);
+        }
+
+        // バックエンド（/api/estimate）への通信処理
         const response = await fetch('/api/estimate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, image: base64Image?.split(',')[1] })
+            body: JSON.stringify({ text: text, image: imageBase64 })
         });
 
         const food = await response.json();
 
         if (food.error) {
-            console.error("APIエラー:", food);
-            status.innerText = "解析に失敗しました";
-            alert("エラー: " + food.error + "\n" + (food.raw_text || ""));
+            status.innerText = "エラー: " + food.error;
             return;
         }
 
+        // 解析された栄養素を変数に変換
         const pVal = parseFloat(food.p) || 0;
         const fVal = parseFloat(food.f) || 0;
         const cVal = parseFloat(food.c) || 0;
         const kVal = parseFloat(food.k) || 0;
+        const nameVal = food.name || "AI解析メニュー";
 
+        // 今日の合計に加算
         total.p += pVal;
         total.f += fVal;
         total.c += cVal;
         total.k += kVal;
 
-        history.push({ 
-            name: "[AI] " + food.name, 
-            p: pVal, 
-            f: fVal, 
-            c: cVal, 
-            k: kVal 
-        });
+        // 履歴に追加
+        history.push({ name: `[AI] ${nameVal}`, p: pVal, f: fVal, c: cVal, k: kVal });
         
+        // 画面のグラフや数値を更新
         updateDisplay();
         updateChart();
         updateHistory();
-        saveData();
         updateWeeklyChart();
 
-        status.innerText = "追加完了！";
+        // ★★★ ご要望の修正箇所 ★★★
+        // すべての処理が成功し、画面が更新された「一番最後」にカウントを増やして保存！
+        apiUsageCount++;
+        saveData();
+        updateApiRemainDisplay(); 
+
+        // ステータスを「解析完了！」に変更
+        status.innerText = "解析完了！";
+        
+        // 入力欄をリセット
         document.getElementById("aiText").value = "";
         document.getElementById("aiImage").value = "";
+
     } catch (e) {
         console.error(e);
-        status.innerText = "エラーが発生しました";
+        status.innerText = "通信エラーが発生しました";
     } finally {
+        // 成功しても失敗しても、最後に必ずボタンを元に戻す
         btn.disabled = false;
     }
 }
@@ -316,7 +333,8 @@ async function saveData() {
         await setDoc(doc(db, "users", currentUser.uid, "records", currentDate), {
             total: total,
             history: history,
-            weight: currentWeight
+            weight: currentWeight,
+            apiUsageCount: apiUsageCount // ★ これを追加
         });
         console.log(`${currentDate} のデータを保存しました！`);
     } catch (e) {
@@ -324,6 +342,7 @@ async function saveData() {
     }
 }
 
+// ▼ loadData関数を修正
 async function loadData() {
     if (!currentUser) return;
     try {
@@ -334,10 +353,12 @@ async function loadData() {
             if (typeof total.water === 'undefined') total.water = 0; 
             history = data.history || [];
             currentWeight = data.weight || null;
+            apiUsageCount = data.apiUsageCount || 0; // ★ これを追加
         } else {
             total = {p:0, f:0, c:0, k:0, water:0};
             history = [];
             currentWeight = null;
+            apiUsageCount = 0; // ★ これを追加
         }
         
         document.getElementById("dailyWeight").value = currentWeight || "";
@@ -345,6 +366,7 @@ async function loadData() {
         updateDisplay();
         updateChart();
         updateHistory();
+        updateApiRemainDisplay();
         console.log(`${currentDate} のデータを読み込みました！`);
     } catch (e) {
         console.error("読み込みエラー: ", e);
@@ -429,9 +451,11 @@ onAuthStateChanged(auth, async (user) => {
         
         total = {p:0, f:0, c:0, k:0, water:0};
         history = [];
+        apiUsageCount = 0; // ★これを追加
         updateDisplay();
         updateChart();
         updateHistory();
+        updateApiRemainDisplay(); // ★これを追加
     }
 });
 
@@ -1274,7 +1298,14 @@ async function getRecentWorkouts() {
 
 // 3. トレーニング生成のメイン処理
 async function generateWorkout() {
+    // ★ 最初に上限チェックを追加
+    if (apiUsageCount >= MAX_API_CALLS) {
+        alert(`本日のAI利用上限（${MAX_API_CALLS}回）に達しました。また明日ご利用ください！`);
+        return;
+    }
+
     const btn = document.getElementById("woGenerateBtn");
+    currentGeneratedWorkout = null;
     const statusText = document.getElementById("woStatusText");
     
     btn.disabled = true;
@@ -1330,6 +1361,10 @@ async function generateWorkout() {
         ====================================================================
         */
 
+        // ★ API通信成功時（現在はモック部分）の下でカウントを増やす
+        apiUsageCount++;
+        saveData(); // ★ 回数をFirestoreに保存
+        updateApiRemainDisplay();
         // ⚠️ 以下はAPIが繋がるまでのモック（仮）データです。繋いだら削除してください。
         await new Promise(resolve => setTimeout(resolve, 1500)); // 通信のフリ
         const aiResult = {
@@ -1405,3 +1440,11 @@ async function saveWorkout() {
     }
 }
 window.saveWorkout = saveWorkout;
+function updateApiRemainDisplay() {
+    const remainCountElem = document.getElementById("apiRemainCount");
+    if (remainCountElem) {
+        let remain = MAX_API_CALLS - apiUsageCount;
+        if (remain < 0) remain = 0; // マイナスにならないようガード
+        remainCountElem.innerText = remain;
+    }
+}
